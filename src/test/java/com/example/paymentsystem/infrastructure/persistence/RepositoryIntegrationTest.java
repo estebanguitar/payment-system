@@ -20,6 +20,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -142,6 +144,7 @@ class RepositoryIntegrationTest {
     private void assertSecondLockWaitsUntilRelease(Runnable lockOperation) throws Exception {
         CountDownLatch firstLocked = new CountDownLatch(1);
         CountDownLatch releaseFirst = new CountDownLatch(1);
+        CountDownLatch secondStarted = new CountDownLatch(1);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             Future<?> first = executor.submit(() -> new TransactionTemplate(transactionManager)
@@ -150,12 +153,17 @@ class RepositoryIntegrationTest {
                         firstLocked.countDown();
                         await(releaseFirst);
                     }));
-            firstLocked.await();
-            Future<?> second = executor.submit(() -> new TransactionTemplate(transactionManager)
-                    .executeWithoutResult(status -> lockOperation.run()));
+            assertThat(firstLocked.await(5, TimeUnit.SECONDS)).isTrue();
+            Future<?> second = executor.submit(() -> {
+                secondStarted.countDown();
+                new TransactionTemplate(transactionManager)
+                        .executeWithoutResult(status -> lockOperation.run());
+            });
 
-            Thread.sleep(200);
-            assertThat(second.isDone()).isFalse();
+            assertThat(secondStarted.await(5, TimeUnit.SECONDS)).isTrue();
+            org.assertj.core.api.Assertions.assertThatThrownBy(
+                            () -> second.get(300, TimeUnit.MILLISECONDS))
+                    .isInstanceOf(TimeoutException.class);
             releaseFirst.countDown();
             first.get();
             second.get();

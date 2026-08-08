@@ -26,7 +26,7 @@ public class OutboxScheduler {
     private final Clock clock;
 
     /** 설정된 주기마다 고립 이벤트를 제한 건수만 조회하여 서로 독립적으로 복구 요청한다. */
-    @Scheduled(fixedDelayString = "${payment.outbox.fixed-delay:60000}")
+    @Scheduled(fixedDelayString = "#{@outboxScheduleDelayProvider.fixedDelay()}")
     public void recoverOrphanedEvents() {
         LocalDateTime threshold = LocalDateTime.now(clock)
                 .minus(java.time.Duration.ofMillis(properties.orphanThreshold()));
@@ -46,4 +46,5 @@ public class OutboxScheduler {
             }
         }
     }
+
 }
