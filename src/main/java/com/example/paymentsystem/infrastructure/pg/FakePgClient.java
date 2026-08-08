@@ -32,15 +32,17 @@ public class FakePgClient implements PgClient {
         String transactionId = deterministicId("PAY", request.getIdempotencyKey());
         String responseCode = status == PgResultStatus.APPROVED ? "0000" : "REJECTED";
 
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("status", status.name());
+        payload.put("transactionId", transactionId);
+        payload.put("responseCode", responseCode);
+        payload.put("amount", request.getAmount());
+
         return PgApprovalResponse.builder()
                 .status(status)
                 .pgTransactionId(transactionId)
                 .responseCode(responseCode)
-                .rawPayload(toJson(Map.of(
-                        "status", status.name(),
-                        "transactionId", transactionId,
-                        "responseCode", responseCode,
-                        "amount", request.getAmount())))
+                .rawPayload(toJson(payload))
                 .build();
     }
 

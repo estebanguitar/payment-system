@@ -31,10 +31,15 @@ class FakePgClientTest {
     /** 동일 멱등키의 반복 승인 요청이 같은 PG 거래 ID를 반환하는지 확인한다. */
     @Test
     void returnDeterministicTransactionId() {
-        String first = pgClient.approve(approvalRequest(PgScenario.APPROVED)).getPgTransactionId();
-        String second = pgClient.approve(approvalRequest(PgScenario.APPROVED)).getPgTransactionId();
+        PgApprovalResponse first = pgClient.approve(approvalRequest(PgScenario.APPROVED));
+        PgApprovalResponse second = pgClient.approve(approvalRequest(PgScenario.APPROVED));
 
-        assertThat(second).isEqualTo(first);
+        assertThat(second.getPgTransactionId()).isEqualTo(first.getPgTransactionId());
+        assertThat(second.getRawPayload()).isEqualTo(first.getRawPayload());
+        assertThat(first.getRawPayload()).isEqualTo(
+                "{\"status\":\"APPROVED\",\"transactionId\":\""
+                        + first.getPgTransactionId()
+                        + "\",\"responseCode\":\"0000\",\"amount\":10000}");
     }
 
     /** 거절 시나리오가 예외가 아닌 명시적 거절 응답을 반환하는지 확인한다. */
