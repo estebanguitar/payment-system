@@ -54,14 +54,14 @@ public class Customer {
 
     private static String requireText(String value, String message) {
         if (value == null || value.isBlank()) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, message);
         }
         return value;
     }
 
     private static LocalDateTime requireNow(LocalDateTime now) {
         if (now == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "현재 시각은 필수입니다.");
         }
         return now;
     }

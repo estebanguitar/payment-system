@@ -11,6 +11,12 @@ public class DomainException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    /** 호출부에서 전달한 상세 메시지를 예외 메시지로 사용하는 도메인 예외를 생성한다. */
+    public DomainException(DomainErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = requireErrorCode(errorCode);
+    }
+
     /** Presentation 계층에서 사용할 문자열 업무 오류 코드를 반환한다. */
     public String getCode() {
         return errorCode.getCode();

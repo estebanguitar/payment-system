@@ -7,4 +7,9 @@ public class InvalidPaymentStateException extends DomainException {
     public InvalidPaymentStateException() {
         super(DomainErrorCode.INVALID_PAYMENT_STATE);
     }
+
+    /** 호출부에서 전달한 상세 메시지를 예외 메시지로 사용한다. */
+    public InvalidPaymentStateException(String message) {
+        super(DomainErrorCode.INVALID_PAYMENT_STATE, message);
+    }
 }

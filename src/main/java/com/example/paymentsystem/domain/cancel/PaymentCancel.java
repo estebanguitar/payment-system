@@ -64,7 +64,7 @@ public class PaymentCancel {
         requireId(paymentId);
         this.idempotencyKey = requireText(idempotencyKey, "취소 멱등키는 필수입니다.");
         if (cancelType == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "취소 유형은 필수입니다.");
         }
         validateAmount(cancelType, requestedAmount, remainingAmount);
         requireNow(now);
@@ -125,20 +125,20 @@ public class PaymentCancel {
 
     private static void requireId(Long id) {
         if (id == null || id <= 0) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "결제 식별자는 필수입니다.");
         }
     }
 
     private static String requireText(String value, String message) {
         if (value == null || value.isBlank()) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, message);
         }
         return value;
     }
 
     private static void requireNow(LocalDateTime now) {
         if (now == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "현재 시각은 필수입니다.");
         }
     }
 }

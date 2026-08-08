@@ -44,13 +44,13 @@ public class PgResponseLog {
     private PgResponseLog(Long paymentId, String pgTransactionId, String pgResponseCode,
                           String encryptedPayload, LocalDateTime receivedAt) {
         if (paymentId == null || paymentId <= 0) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "결제 식별자는 필수입니다.");
         }
         if (encryptedPayload == null || encryptedPayload.isBlank()) {
             throw new DomainException(DomainErrorCode.MISSING_ENCRYPTED_PAYLOAD);
         }
         if (receivedAt == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "수신 시각은 필수입니다.");
         }
         this.paymentId = paymentId;
         this.pgTransactionId = pgTransactionId;

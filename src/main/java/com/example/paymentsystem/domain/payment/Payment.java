@@ -133,7 +133,7 @@ public class Payment {
 
     private void requireStatus(PaymentStatus expected, String message) {
         if (status != expected) {
-            throw new InvalidPaymentStateException();
+            throw new InvalidPaymentStateException(message);
         }
     }
 
@@ -145,14 +145,14 @@ public class Payment {
 
     private static String requireText(String value, String message) {
         if (value == null || value.isBlank()) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, message);
         }
         return value;
     }
 
     private static void requireNow(LocalDateTime now) {
         if (now == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "현재 시각은 필수입니다.");
         }
     }
 }

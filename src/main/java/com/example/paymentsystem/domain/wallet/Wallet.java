@@ -40,7 +40,7 @@ public class Wallet {
 
     private Wallet(String customerId, LocalDateTime now) {
         if (customerId == null || customerId.isBlank()) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "고객 식별자는 필수입니다.");
         }
         requireNow(now);
         this.customerId = customerId;
@@ -87,7 +87,7 @@ public class Wallet {
 
     private static void requireNow(LocalDateTime now) {
         if (now == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "현재 시각은 필수입니다.");
         }
     }
 }

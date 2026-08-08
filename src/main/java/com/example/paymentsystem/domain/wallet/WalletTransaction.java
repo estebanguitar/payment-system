@@ -61,7 +61,7 @@ public class WalletTransaction {
             throw new InvalidAmountException();
         }
         if (now == null) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "현재 시각은 필수입니다.");
         }
         this.walletId = walletId;
         this.transactionType = transactionType;
@@ -106,13 +106,13 @@ public class WalletTransaction {
 
     private static void requireId(Long id, String message) {
         if (id == null || id <= 0) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, message);
         }
     }
 
     private static void requireText(String value, String message) {
         if (value == null || value.isBlank()) {
-            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE);
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, message);
         }
     }
 }
