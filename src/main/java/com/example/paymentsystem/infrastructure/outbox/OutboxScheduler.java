@@ -29,7 +29,7 @@ public class OutboxScheduler {
     @Scheduled(fixedDelayString = "${payment.outbox.fixed-delay:60000}")
     public void recoverOrphanedEvents() {
         LocalDateTime threshold = LocalDateTime.now(clock)
-                .minusNanos(properties.orphanThreshold() * 1_000_000);
+                .minus(java.time.Duration.ofMillis(properties.orphanThreshold()));
         List<Long> candidateIds = outboxRepository
                 .findByStatusAndCreatedAtBeforeOrderByCreatedAtAsc(
                         OutboxStatus.INIT, threshold, PageRequest.of(0, properties.batchSize()))
