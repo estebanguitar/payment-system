@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'jacoco'
 	id 'org.springframework.boot' version '3.5.16'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -44,4 +45,16 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// 테스트가 끝나면 협업자가 바로 확인할 수 있는 커버리지 리포트를 생성한다.
+	finalizedBy tasks.named('jacocoTestReport')
+}
+
+tasks.named('jacocoTestReport') {
+	// 단독 리포트 실행 시에도 테스트 실행 결과가 먼저 준비되도록 보장한다.
+	dependsOn tasks.named('test')
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
 }
