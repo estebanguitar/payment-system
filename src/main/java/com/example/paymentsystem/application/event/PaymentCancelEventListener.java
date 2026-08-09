@@ -2,11 +2,11 @@ package com.example.paymentsystem.application.event;
 
 import com.example.paymentsystem.application.service.cancel.PaymentCancelProcessingService;
 import com.example.paymentsystem.application.service.cancel.PaymentCancelResultService;
-import com.example.paymentsystem.application.port.out.pg.PgCancelCommand;
-import com.example.paymentsystem.application.port.out.pg.PgCancelResult;
-import com.example.paymentsystem.application.port.out.pg.PgClient;
-import com.example.paymentsystem.application.port.out.pg.PgClientException;
-import com.example.paymentsystem.application.port.out.pg.PgResultStatus;
+import com.example.paymentsystem.pg.application.port.out.pg.PgCancelCommand;
+import com.example.paymentsystem.pg.application.port.out.pg.PgCancelResult;
+import com.example.paymentsystem.pg.application.port.out.pg.PgClient;
+import com.example.paymentsystem.pg.application.port.out.pg.PgClientException;
+import com.example.paymentsystem.pg.application.port.out.pg.PgResultStatus;
 import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

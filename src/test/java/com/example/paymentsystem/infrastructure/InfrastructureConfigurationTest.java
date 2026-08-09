@@ -2,7 +2,7 @@ package com.example.paymentsystem.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
+import com.example.paymentsystem.pg.application.port.out.security.PayloadEncryptor;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.junit.jupiter.api.Test;

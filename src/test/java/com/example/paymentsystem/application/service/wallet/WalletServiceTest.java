@@ -13,7 +13,7 @@ import com.example.paymentsystem.application.service.idempotency.IdempotencyConf
 import com.example.paymentsystem.application.util.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;
 import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
-import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
+import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletRepository;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletTransactionRepository;
 import java.time.LocalDateTime;

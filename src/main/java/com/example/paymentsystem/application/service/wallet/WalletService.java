@@ -8,7 +8,7 @@ import com.example.paymentsystem.shared.application.exception.ApplicationExcepti
 import com.example.paymentsystem.application.service.idempotency.IdempotencyConflictResolver;
 import com.example.paymentsystem.application.util.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;
-import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
+import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletRepository;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletTransactionRepository;

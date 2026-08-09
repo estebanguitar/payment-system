@@ -13,7 +13,7 @@ import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentSpecifications;
-import com.example.paymentsystem.infrastructure.repository.pg.PgResponseLogRepository;
+import com.example.paymentsystem.pg.infrastructure.repository.PgResponseLogRepository;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.paymentsystem.domain.entity.cancel.CancelType;
 import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
-import com.example.paymentsystem.domain.entity.customer.Customer;
+import com.example.paymentsystem.customer.domain.Customer;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;
-import com.example.paymentsystem.domain.entity.pg.PgResponseLog;
+import com.example.paymentsystem.pg.domain.PgResponseLog;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;
 import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
 import java.time.LocalDateTime;

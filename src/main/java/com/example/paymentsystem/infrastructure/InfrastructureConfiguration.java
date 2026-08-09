@@ -1,10 +1,10 @@
 package com.example.paymentsystem.infrastructure;
 
-import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
+import com.example.paymentsystem.pg.application.port.out.security.PayloadEncryptor;
 import com.example.paymentsystem.infrastructure.outbox.OutboxProperties;
-import com.example.paymentsystem.infrastructure.pg.PgProperties;
-import com.example.paymentsystem.infrastructure.security.AesGcmPayloadEncryptor;
-import com.example.paymentsystem.infrastructure.security.PaymentSecurityProperties;
+import com.example.paymentsystem.pg.infrastructure.adapter.PgProperties;
+import com.example.paymentsystem.pg.infrastructure.security.AesGcmPayloadEncryptor;
+import com.example.paymentsystem.pg.infrastructure.security.PaymentSecurityProperties;
 import java.time.Clock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

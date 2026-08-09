@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.paymentsystem.domain.entity.cancel.CancelType;
 import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
-import com.example.paymentsystem.domain.entity.customer.Customer;
+import com.example.paymentsystem.customer.domain.Customer;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;
 import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
 import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
-import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
+import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
 import com.example.paymentsystem.infrastructure.repository.wallet.WalletRepository;

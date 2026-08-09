@@ -9,7 +9,7 @@ import com.example.paymentsystem.application.util.IdempotencyFingerprintGenerato
 import com.example.paymentsystem.application.dto.outbox.OutboxEventPayload;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;
-import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
+import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRecord;
 import com.example.paymentsystem.infrastructure.repository.idempotency.IdempotencyRecordRepository;
 import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
