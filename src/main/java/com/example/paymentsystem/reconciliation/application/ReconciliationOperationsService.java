@@ -10,6 +10,7 @@ import com.example.paymentsystem.reconciliation.infrastructure.repository.Reconc
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationRunRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,22 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** 대사 실행·Case 조회와 수동 판정 이력을 제공한다. */
 @Service
+@RequiredArgsConstructor
 public class ReconciliationOperationsService {
   private final ReconciliationRunRepository runs;
   private final ReconciliationCaseRepository cases;
   private final ReconciliationActionHistoryRepository histories;
   private final List<ReconciliationDetector> detectors;
-
-  public ReconciliationOperationsService(
-      ReconciliationRunRepository r,
-      ReconciliationCaseRepository c,
-      ReconciliationActionHistoryRepository h,
-      List<ReconciliationDetector> d) {
-    runs = r;
-    cases = c;
-    histories = h;
-    detectors = d;
-  }
 
   /** 실행 이력을 최신순 조회한다. */
   public Page<ReconciliationRun> runs(int page, int size) {

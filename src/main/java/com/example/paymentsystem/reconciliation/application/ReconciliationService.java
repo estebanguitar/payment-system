@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /** 대사 검사기를 부분 실패 격리하여 실행하고 Case를 멱등 반영한다. */
 @Service
+@RequiredArgsConstructor
 public class ReconciliationService implements ReconciliationExecutionPort {
   private final List<ReconciliationDetector> detectors;
   private final ReconciliationRunRepository runs;
@@ -26,30 +27,9 @@ public class ReconciliationService implements ReconciliationExecutionPort {
   private final MeterRegistry metrics;
   private final Clock clock;
 
-  @Autowired
-  public ReconciliationService(
-      List<ReconciliationDetector> detectors,
-      ReconciliationRunRepository runs,
-      ReconciliationCaseRepository cases,
-      MeterRegistry metrics) {
-    this(detectors, runs, cases, metrics, Clock.systemUTC());
-  }
-
-  ReconciliationService(
-      List<ReconciliationDetector> d,
-      ReconciliationRunRepository r,
-      ReconciliationCaseRepository c,
-      MeterRegistry m,
-      Clock clock) {
-    detectors = d;
-    runs = r;
-    cases = c;
-    metrics = m;
-    this.clock = clock;
-  }
-
   /** 동일 범위 요청은 기존 Run을 반환하고 검사기 실패는 나머지 검사와 격리한다. */
   @Transactional
+  @Override
   public ReconciliationRun execute(LocalDateTime from, LocalDateTime to, String requester) {
     String key =
         UUID.nameUUIDFromBytes((from + "|" + to).getBytes(StandardCharsets.UTF_8)).toString();

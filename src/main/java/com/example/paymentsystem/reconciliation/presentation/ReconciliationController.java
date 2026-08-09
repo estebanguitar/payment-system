@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,15 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "운영 대사")
 @RestController
 @RequestMapping("/api/v1/ops")
+@RequiredArgsConstructor
 public class ReconciliationController {
   private final ReconciliationExecutionPort executor;
   private final ReconciliationOperationsService operations;
-
-  public ReconciliationController(
-      ReconciliationExecutionPort e, ReconciliationOperationsService o) {
-    executor = e;
-    operations = o;
-  }
 
   @Operation(summary = "대사 실행")
   @PostMapping("/reconciliations/runs")

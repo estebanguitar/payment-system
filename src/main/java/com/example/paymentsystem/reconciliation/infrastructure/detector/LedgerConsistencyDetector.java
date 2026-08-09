@@ -7,24 +7,24 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationFinding;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /** 결제·지갑·취소·PG·Outbox 원장을 SQL 집계로 교차 검증한다. */
 @Component
+@RequiredArgsConstructor
 public class LedgerConsistencyDetector implements ReconciliationDetector {
   private final JdbcTemplate jdbc;
 
-  public LedgerConsistencyDetector(JdbcTemplate jdbc) {
-    this.jdbc = jdbc;
-  }
-
   /** 검사기 식별자를 반환한다. */
+  @Override
   public String name() {
     return "ledger-consistency";
   }
 
   /** 시간 범위의 핵심 원장 불일치를 읽기 전용 쿼리로 탐지한다. */
+  @Override
   public List<ReconciliationFinding> detect(LocalDateTime from, LocalDateTime to) {
     List<ReconciliationFinding> result = new ArrayList<>();
     query(

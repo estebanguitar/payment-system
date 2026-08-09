@@ -7,24 +7,24 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationFinding;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /** 장기 대기 상태와 취소 환불·Outbox 처리 흔적 누락을 탐지한다. */
 @Component
+@RequiredArgsConstructor
 public class OperationalTraceDetector implements ReconciliationDetector {
   private final JdbcTemplate jdbc;
 
-  public OperationalTraceDetector(JdbcTemplate jdbc) {
-    this.jdbc = jdbc;
-  }
-
   /** 검사기 식별자를 반환한다. */
+  @Override
   public String name() {
     return "operational-trace";
   }
 
   /** 범위 종료 10분 전까지 완료되지 않은 처리와 환불 누락을 찾는다. */
+  @Override
   public List<ReconciliationFinding> detect(LocalDateTime from, LocalDateTime to) {
     List<ReconciliationFinding> result = new ArrayList<>();
     LocalDateTime cutoff = to.minusMinutes(10);
