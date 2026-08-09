@@ -18,7 +18,7 @@ public class OutboxStatusService {
     private final PaymentOutboxRepository outboxRepository;
     private final OutboxProperties properties;
 
-    /** 재시도 횟수를 증가시키고 한도에 도달하면 최종 실패로 전환한다. */
+    /** 재시도 횟수를 증가시키고 한도에 도달하면 운영자 확인 대상 상태로 격리한다. */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void recordFailure(Long outboxId) {
         PaymentOutbox outbox = outboxRepository.findByIdWithLock(outboxId)
@@ -26,7 +26,7 @@ public class OutboxStatusService {
         LocalDateTime now = LocalDateTime.now();
         outbox.recordFailure(now);
         if (outbox.getRetryCount() >= properties.maxRetryCount()) {
-            outbox.markFailed(now);
+            outbox.markDeadLetter(now);
         }
     }
 }

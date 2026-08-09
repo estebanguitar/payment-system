@@ -48,7 +48,7 @@ class OutboxWorkerContextTest {
                                            status, retry_count, created_at, updated_at, next_attempt_at)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, 100L, 100L, "WORKER-OUTBOX", "PAYMENT_REQUESTED", "{\"paymentId\":100}",
-                "INIT", 0, now, now, now);
+                "INIT", 0, now, now, now.minusSeconds(1));
 
         boolean first = claimService.claim(100L, "worker-a", now, now.plusMinutes(1));
         boolean second = claimService.claim(100L, "worker-b", now, now.plusMinutes(1));

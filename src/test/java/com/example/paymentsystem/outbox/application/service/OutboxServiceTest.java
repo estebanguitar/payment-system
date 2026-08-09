@@ -71,7 +71,7 @@ class OutboxServiceTest {
         assertThatThrownBy(() -> service.get(2L)).isInstanceOf(RuntimeException.class);
     }
 
-    /** recordFailure가 횟수를 증가시키고 한도 도달 시 FAILED로 전환하는지 확인한다. */
+    /** recordFailure가 횟수를 증가시키고 한도 도달 시 DEAD_LETTER로 격리하는지 확인한다. */
     @Test
     void recordFailureAndMarkFailed() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
@@ -80,7 +80,7 @@ class OutboxServiceTest {
         OutboxStatusService service = new OutboxStatusService(repository,
                 new OutboxProperties(false, 1, 1, 1, 1, 1));
         service.recordFailure(1L);
-        assertThat(outbox.getStatus()).isEqualTo(OutboxStatus.FAILED);
+        assertThat(outbox.getStatus()).isEqualTo(OutboxStatus.DEAD_LETTER);
         assertThat(outbox.getRetryCount()).isEqualTo(1);
     }
 }

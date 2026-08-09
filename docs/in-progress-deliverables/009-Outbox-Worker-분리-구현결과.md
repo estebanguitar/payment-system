@@ -22,6 +22,8 @@ DB 조건부 갱신 결과가 1건인 Worker만 외부 처리를 시작한다. �
 - API Controller 없이 Worker Context가 기동되는지 검증한다.
 - 같은 이벤트에 대한 두 번째 Worker 선점이 실패하는지 DB 통합 테스트로 검증한다.
 - 선점 성공 이벤트만 복구 UseCase로 전달되는지 단위 테스트로 검증한다.
+- 실패 횟수 한도 도달 시 독립 트랜잭션에서 `DEAD_LETTER`로 전환되고, 포이즌 이벤트 뒤의 후보도 계속 처리되는지 검증한다.
+- API 컨텍스트에 실제 `@Scheduled` 메서드가 존재하지 않는지 검증한다.
 - API와 Worker 테스트, JaCoCo HTML, `bootJar`를 검증한다.
 
 ## 5. 운영 제약
