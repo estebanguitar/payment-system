@@ -29,7 +29,15 @@ spring:
 
 payment:
   security:
-    encryption-key: "PaymentSystemEncryptionKeySecret32"
+    encryption-key: ${PAYMENT_ENCRYPTION_SECRET:}
+  pg:
+    default-scenario: APPROVED
+  outbox:
+    enabled: false
+    fixed-delay: 60000
+    orphan-threshold: 60000
+    batch-size: 50
+    max-retry-count: 5
 
 management:
   endpoints:
@@ -58,4 +66,3 @@ info:
     version: "0.0.1-SNAPSHOT"
     encoding: "UTF-8"
     java-version: "17"
-
