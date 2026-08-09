@@ -32,12 +32,11 @@ public class OutboxRecoveryService implements OutboxRecoveryUseCase {
         if (outbox.getStatus() != OutboxStatus.INIT && outbox.getStatus() != OutboxStatus.PROCESSING) {
             return;
         }
-        OutboxEventPayload payload = payload(outbox.getPayload());
-        if (!outbox.getPaymentId().equals(payload.paymentId())) {
-            statusService.recordFailure(outboxId);
-            throw new ApplicationException(ApplicationErrorCode.SYSTEM_ERROR);
-        }
         try {
+            OutboxEventPayload payload = payload(outbox.getPayload());
+            if (!outbox.getPaymentId().equals(payload.paymentId())) {
+                throw new ApplicationException(ApplicationErrorCode.SYSTEM_ERROR);
+            }
             switch (outbox.getEventType()) {
                 case PAYMENT_REQUESTED -> paymentListener.handle(
                         new PaymentCreatedEvent(payload.paymentId(), outboxId));

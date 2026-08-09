@@ -16,12 +16,13 @@ public class OutboxWorkerMetrics {
     private final Counter success;
     private final Counter failure;
     private final Counter retry;
-    private final AtomicReference<Instant> heartbeat = new AtomicReference<>(Instant.EPOCH);
+    private final AtomicReference<Instant> heartbeat;
     private final Clock clock;
 
     /** Worker 운영 지표와 상태별 gauge를 등록한다. */
     public OutboxWorkerMetrics(MeterRegistry registry, PaymentOutboxRepository repository, Clock clock) {
         this.clock = clock;
+        heartbeat = new AtomicReference<>(clock.instant());
         success = registry.counter("payment.outbox.worker.success");
         failure = registry.counter("payment.outbox.worker.failure");
         retry = registry.counter("payment.outbox.worker.retry");
