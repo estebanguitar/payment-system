@@ -1,0 +1,20 @@
+services:
+  payment-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: payment-system:local
+    container_name: payment-system
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PAYMENT_ENCRYPTION_SECRET: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      TZ: Asia/Seoul
+      JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Seoul
+    ports:
+      - "8080:8080"
+    volumes:
+      - payment-data:/data
+    restart: unless-stopped
+
+volumes:
+  payment-data:
