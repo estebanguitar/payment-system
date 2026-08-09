@@ -578,3 +578,10 @@ MSA 전환은 부하 테스트에서 확인된 독립 확장 필요성, 장애 �
 8. 부하 테스트 이후 MSA 후보별 확장성과 정합성 전략을 ADR로 기록한다.
 
 구조 변경 전후 공개 API, DB 스키마, 업무 상태 전이 및 멱등성 동작은 동일해야 한다. 의도된 변경이 발생하면 영향 범위와 마이그레이션 방법을 별도 변경 기록에 남긴다.
+# 최신화 메모 (2026-08-09)
+
+- 현재 규모에는 `controller` → `service` → `repository` → `domain`의 간결한 레이어드 모놀리스를 적용한다.
+- 결제와 취소 모델은 `payment` 하위에 함께 배치한다.
+- `PaymentEventListener`와 `PaymentCancelEventListener`는 커밋 후 즉시 실행을 요청하는 어댑터이며, 실제 PG 처리 책임은 `OutboxProcessor`가 가진다.
+- `OutboxScheduler`는 동일한 `OutboxProcessor`를 호출하여 `PENDING/RETRY` 이벤트만 복구한다.
+- 경량 대사 스케줄러는 읽기 비교와 Break 생성만 수행하며 업무 데이터를 자동 보정하지 않는다.

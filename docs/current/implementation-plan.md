@@ -179,3 +179,10 @@ com.example.paymentsystem
 - 테스트는 `src/test/unit/java`와 `src/test/integration/java` source set으로 물리 분리했다.
 - 단위 테스트는 payment, wallet, cancellation, outbox, audit, idempotency, pg, common 도메인 아래 역할별로 배치했다.
 - 통합 테스트는 api, persistence, payment, audit, outbox, architecture 관심사별로 배치하되 Java package는 운영 코드와 동일하게 유지해 불필요한 접근 제한자 변경을 방지했다.
+# 승인 범위 반영 (2026-08-09)
+
+- 결제와 취소 패키지를 `payment`로 통합하고 Result 전용 서비스를 제거한다.
+- 단일 호출 인터페이스인 `OutboxRecoveryUseCase`를 제거하고 `OutboxProcessor`로 실제 PG 처리 책임을 모은다.
+- Listener는 즉시 처리 트리거, Scheduler는 복구 트리거로 제한한다.
+- 경량 대사 도메인·저장소·서비스·스케줄러·조회 API와 Flyway DDL을 추가한다.
+- 과거 문서는 `docs/archive`, 현재 기준 문서는 `docs/current`로 구분한다.
