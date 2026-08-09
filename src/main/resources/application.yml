@@ -38,6 +38,7 @@ payment:
     orphan-threshold: 60000
     batch-size: 50
     max-retry-count: 5
+    lease-duration: 120000
 
 management:
   endpoints:

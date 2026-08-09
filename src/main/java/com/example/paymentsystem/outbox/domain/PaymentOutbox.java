@@ -55,6 +55,15 @@ public class PaymentOutbox {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "worker_id", length = 128)
+    private String workerId;
+
+    @Column(name = "lease_until")
+    private LocalDateTime leaseUntil;
+
+    @Column(name = "next_attempt_at")
+    private LocalDateTime nextAttemptAt;
+
     private PaymentOutbox(Long paymentId, String idempotencyKey, OutboxEventType eventType,
                           String payload, LocalDateTime now) {
         requireId(paymentId);
@@ -67,6 +76,7 @@ public class PaymentOutbox {
         this.retryCount = 0;
         this.createdAt = now;
         this.updatedAt = now;
+        this.nextAttemptAt = now;
     }
 
     /** 결제 요청 이벤트를 아직 발행되지 않은 INIT 상태로 생성한다. */
@@ -84,15 +94,17 @@ public class PaymentOutbox {
 
     /** 발행 대기 중인 이벤트를 정상 발행 완료 상태로 전환한다. */
     public void markPublished(LocalDateTime now) {
-        requireInit();
+        requireRecoverable();
         requireNow(now);
         status = OutboxStatus.PUBLISHED;
         updatedAt = now;
+        workerId = null;
+        leaseUntil = null;
     }
 
     /** 발행 실패 횟수를 증가시키되 재시도 가능한 INIT 상태를 유지한다. */
     public void recordFailure(LocalDateTime now) {
-        requireInit();
+        requireRecoverable();
         requireNow(now);
         try {
             retryCount = Math.incrementExact(retryCount);
@@ -100,14 +112,34 @@ public class PaymentOutbox {
             throw new DomainException(DomainErrorCode.OUTBOX_RETRY_OVERFLOW);
         }
         updatedAt = now;
+        status = OutboxStatus.INIT;
+        workerId = null;
+        leaseUntil = null;
+        nextAttemptAt = now.plusSeconds(Math.min(300, 1L << Math.min(retryCount, 8)));
     }
 
     /** 재시도 정책이 종료된 발행 대기 이벤트를 최종 실패 상태로 전환한다. */
     public void markFailed(LocalDateTime now) {
-        requireInit();
+        requireRecoverable();
         requireNow(now);
         status = OutboxStatus.FAILED;
         updatedAt = now;
+    }
+
+    /** 재시도 한도를 초과한 이벤트를 운영자 확인 대상 격리 상태로 전환한다. */
+    public void markDeadLetter(LocalDateTime now) {
+        requireRecoverable();
+        requireNow(now);
+        status = OutboxStatus.DEAD_LETTER;
+        updatedAt = now;
+        workerId = null;
+        leaseUntil = null;
+    }
+
+    private void requireRecoverable() {
+        if (status != OutboxStatus.INIT && status != OutboxStatus.PROCESSING) {
+            throw new InvalidPaymentStateException();
+        }
     }
 
     private void requireInit() {

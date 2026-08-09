@@ -29,7 +29,7 @@ public class OutboxRecoveryService implements OutboxRecoveryUseCase {
     @Override
     public void recover(Long outboxId) {
         PaymentOutbox outbox = queryService.get(outboxId);
-        if (outbox.getStatus() != OutboxStatus.INIT) {
+        if (outbox.getStatus() != OutboxStatus.INIT && outbox.getStatus() != OutboxStatus.PROCESSING) {
             return;
         }
         OutboxEventPayload payload = payload(outbox.getPayload());
