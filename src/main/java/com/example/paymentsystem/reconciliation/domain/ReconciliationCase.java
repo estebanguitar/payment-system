@@ -1,7 +1,10 @@
 package com.example.paymentsystem.reconciliation.domain;
 
-import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.*;
-import jakarta.persistence.*;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.ActionType;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.CaseStatus;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.MismatchType;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Severity;
+import jakarta.persistence.Column; import jakarta.persistence.Entity; import jakarta.persistence.EnumType; import jakarta.persistence.Enumerated; import jakarta.persistence.GeneratedValue; import jakarta.persistence.GenerationType; import jakarta.persistence.Id; import jakarta.persistence.Lob; import jakarta.persistence.Table; import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
