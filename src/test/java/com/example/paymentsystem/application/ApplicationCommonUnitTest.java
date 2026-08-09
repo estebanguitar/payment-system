@@ -15,7 +15,7 @@ import com.example.paymentsystem.pg.application.port.out.pg.PgErrorType;
 import com.example.paymentsystem.customer.application.CustomerQueryService;
 import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
 import com.example.paymentsystem.customer.domain.Customer;
-import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
+import com.example.paymentsystem.wallet.domain.WalletTransaction;
 import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import java.util.List;
 import java.util.Optional;

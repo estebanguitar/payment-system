@@ -16,8 +16,8 @@ import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelR
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
 import com.example.paymentsystem.pg.infrastructure.repository.PgResponseLogRepository;
-import com.example.paymentsystem.infrastructure.repository.wallet.WalletRepository;
-import com.example.paymentsystem.infrastructure.repository.wallet.WalletTransactionRepository;
+import com.example.paymentsystem.wallet.infrastructure.repository.WalletRepository;
+import com.example.paymentsystem.wallet.infrastructure.repository.WalletTransactionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;

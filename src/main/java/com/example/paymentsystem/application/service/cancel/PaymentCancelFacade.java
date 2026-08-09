@@ -3,9 +3,9 @@ package com.example.paymentsystem.application.service.cancel;
 import com.example.paymentsystem.application.dto.cancel.PaymentCancelCommand;
 import com.example.paymentsystem.application.dto.cancel.PaymentCancelResult;
 
-import com.example.paymentsystem.application.service.idempotency.IdempotencyConflictResolver;
-import com.example.paymentsystem.application.util.IdempotencyFingerprintGenerator;
-import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
+import com.example.paymentsystem.idempotency.application.service.IdempotencyConflictResolver;
+import com.example.paymentsystem.idempotency.application.IdempotencyFingerprintGenerator;
+import com.example.paymentsystem.idempotency.domain.IdempotencyRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.example.paymentsystem.application.dto.query;
 
-import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
-import com.example.paymentsystem.domain.entity.wallet.WalletTransactionType;
+import com.example.paymentsystem.wallet.domain.WalletTransaction;
+import com.example.paymentsystem.wallet.domain.WalletTransactionType;
 import java.time.LocalDateTime;
 
 /** 운영 조회에 필요한 지갑 거래 참조 정보만 전달한다. */

@@ -11,7 +11,7 @@ import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
 import com.example.paymentsystem.pg.infrastructure.repository.PgResponseLogRepository;
-import com.example.paymentsystem.infrastructure.repository.wallet.WalletTransactionRepository;
+import com.example.paymentsystem.wallet.infrastructure.repository.WalletTransactionRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
