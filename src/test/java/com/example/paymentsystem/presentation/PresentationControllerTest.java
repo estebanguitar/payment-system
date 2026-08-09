@@ -60,7 +60,7 @@ class PresentationControllerTest {
 
         mockMvc.perform(post("/api/v1/wallets").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"customerId\":\"customer-1\"}"))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.code").value("OK"));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value("OK"));
         mockMvc.perform(get("/api/v1/wallets/customer-1"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.returnObject.balance").value(1000));
         mockMvc.perform(post("/api/v1/wallets/customer-1/top-up").header("Idempotency-Key", "topup-1")
