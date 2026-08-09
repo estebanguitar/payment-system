@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.example.paymentsystem.application.port.out.pg.PgApprovalResult;
 import com.example.paymentsystem.application.port.out.pg.PgResultStatus;
 import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
-import com.example.paymentsystem.domain.exception.InsufficientBalanceException;
+import com.example.paymentsystem.shared.domain.exception.InsufficientBalanceException;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;

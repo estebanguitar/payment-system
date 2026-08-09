@@ -1,7 +1,7 @@
 package com.example.paymentsystem.presentation.wallet;
 
 import com.example.paymentsystem.application.service.wallet.WalletService;
-import com.example.paymentsystem.presentation.common.ApiResponse;
+import com.example.paymentsystem.shared.presentation.ApiResponse;
 import com.example.paymentsystem.presentation.wallet.dto.CreateWalletRequest;
 import com.example.paymentsystem.presentation.wallet.dto.TopUpWalletRequest;
 import com.example.paymentsystem.presentation.wallet.dto.WalletResponse;

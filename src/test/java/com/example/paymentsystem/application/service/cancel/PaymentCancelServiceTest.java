@@ -10,7 +10,7 @@ import com.example.paymentsystem.application.dto.cancel.PaymentCancelCommand;
 import com.example.paymentsystem.application.dto.cancel.PaymentCancelResult;
 import com.example.paymentsystem.application.event.PaymentCancelCreatedEvent;
 import com.example.paymentsystem.application.event.PaymentCancelEventListener;
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.application.port.out.pg.PgCancelResult;
 import com.example.paymentsystem.application.port.out.pg.PgClient;
 import com.example.paymentsystem.application.port.out.pg.PgClientException;

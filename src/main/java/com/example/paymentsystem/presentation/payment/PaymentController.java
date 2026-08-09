@@ -2,7 +2,7 @@ package com.example.paymentsystem.presentation.payment;
 
 import com.example.paymentsystem.application.service.cancel.PaymentCancelFacade;
 import com.example.paymentsystem.application.service.payment.PaymentFacade;
-import com.example.paymentsystem.presentation.common.ApiResponse;
+import com.example.paymentsystem.shared.presentation.ApiResponse;
 import com.example.paymentsystem.presentation.payment.dto.CancelPaymentRequest;
 import com.example.paymentsystem.presentation.payment.dto.CreatePaymentRequest;
 import com.example.paymentsystem.presentation.payment.dto.PaymentCancelResponse;

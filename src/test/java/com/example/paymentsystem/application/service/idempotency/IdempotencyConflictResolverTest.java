@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRecord;
 import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
 import com.example.paymentsystem.infrastructure.repository.idempotency.IdempotencyRecordRepository;

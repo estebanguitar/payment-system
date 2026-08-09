@@ -1,6 +1,6 @@
 package com.example.paymentsystem.presentation.query.dto;
 
-import com.example.paymentsystem.application.dto.query.PageResult;
+import com.example.paymentsystem.shared.application.dto.PageResult;
 import java.util.List;
 import java.util.function.Function;
 

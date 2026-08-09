@@ -1,8 +1,8 @@
 package com.example.paymentsystem.domain.entity.wallet;
 
-import com.example.paymentsystem.domain.exception.DomainErrorCode;
-import com.example.paymentsystem.domain.exception.DomainException;
-import com.example.paymentsystem.domain.exception.InvalidAmountException;
+import com.example.paymentsystem.shared.domain.exception.DomainErrorCode;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
+import com.example.paymentsystem.shared.domain.exception.InvalidAmountException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

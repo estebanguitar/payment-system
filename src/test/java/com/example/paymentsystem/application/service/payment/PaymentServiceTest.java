@@ -10,7 +10,7 @@ import com.example.paymentsystem.application.dto.payment.PaymentCommand;
 import com.example.paymentsystem.application.dto.payment.PaymentResult;
 import com.example.paymentsystem.application.event.PaymentCreatedEvent;
 import com.example.paymentsystem.application.event.PaymentEventListener;
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.application.port.out.pg.PgApprovalResult;
 import com.example.paymentsystem.application.port.out.pg.PgClient;
 import com.example.paymentsystem.application.port.out.pg.PgClientException;

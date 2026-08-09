@@ -1,7 +1,7 @@
 package com.example.paymentsystem.application.service.outbox;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.infrastructure.outbox.OutboxProperties;
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;

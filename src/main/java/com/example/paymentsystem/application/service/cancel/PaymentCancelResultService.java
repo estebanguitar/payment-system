@@ -2,8 +2,8 @@ package com.example.paymentsystem.application.service.cancel;
 
 import com.example.paymentsystem.application.dto.cancel.PaymentCancelResult;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
 import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.example.paymentsystem.application.dto.query.PaymentSearchCondition;
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
 import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;

@@ -3,8 +3,8 @@ package com.example.paymentsystem.domain.entity.payment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.paymentsystem.domain.exception.InvalidCancelAmountException;
-import com.example.paymentsystem.domain.exception.InvalidPaymentStateException;
+import com.example.paymentsystem.shared.domain.exception.InvalidCancelAmountException;
+import com.example.paymentsystem.shared.domain.exception.InvalidPaymentStateException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 

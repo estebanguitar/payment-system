@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.application.dto.query.PageResult;
+import com.example.paymentsystem.shared.application.dto.PageResult;
 import com.example.paymentsystem.application.dto.query.PaymentCancelView;
 import com.example.paymentsystem.application.dto.query.WalletTransactionView;
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.application.port.out.pg.PgClientException;
 import com.example.paymentsystem.application.port.out.pg.PgErrorType;
 import com.example.paymentsystem.application.service.customer.CustomerQueryService;

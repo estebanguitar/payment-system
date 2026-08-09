@@ -1,7 +1,7 @@
 package com.example.paymentsystem.application.service.customer;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.domain.entity.customer.Customer;
 import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
 import lombok.RequiredArgsConstructor;

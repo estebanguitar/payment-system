@@ -1,9 +1,9 @@
 package com.example.paymentsystem.domain.entity.cancel;
 
-import com.example.paymentsystem.domain.exception.DomainErrorCode;
-import com.example.paymentsystem.domain.exception.DomainException;
-import com.example.paymentsystem.domain.exception.InvalidCancelAmountException;
-import com.example.paymentsystem.domain.exception.InvalidPaymentStateException;
+import com.example.paymentsystem.shared.domain.exception.DomainErrorCode;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
+import com.example.paymentsystem.shared.domain.exception.InvalidCancelAmountException;
+import com.example.paymentsystem.shared.domain.exception.InvalidPaymentStateException;
 import com.example.paymentsystem.domain.entity.payment.PaymentFailureReason;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

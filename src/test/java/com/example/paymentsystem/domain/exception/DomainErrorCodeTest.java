@@ -1,4 +1,4 @@
-package com.example.paymentsystem.domain.exception;
+package com.example.paymentsystem.shared.domain.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

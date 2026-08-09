@@ -1,10 +1,10 @@
 package com.example.paymentsystem.application.service.payment;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.application.port.out.pg.PgApprovalResult;
 import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
-import com.example.paymentsystem.domain.exception.InsufficientBalanceException;
+import com.example.paymentsystem.shared.domain.exception.InsufficientBalanceException;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.domain.entity.payment.PaymentFailureReason;

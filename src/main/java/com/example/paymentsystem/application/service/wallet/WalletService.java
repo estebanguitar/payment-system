@@ -3,8 +3,8 @@ package com.example.paymentsystem.application.service.wallet;
 import com.example.paymentsystem.application.dto.wallet.WalletCommand;
 import com.example.paymentsystem.application.dto.wallet.WalletResult;
 
-import com.example.paymentsystem.application.exception.ApplicationErrorCode;
-import com.example.paymentsystem.application.exception.ApplicationException;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.application.service.idempotency.IdempotencyConflictResolver;
 import com.example.paymentsystem.application.util.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;

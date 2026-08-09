@@ -1,7 +1,7 @@
 package com.example.paymentsystem.presentation.query;
 
 import com.example.paymentsystem.application.service.query.PaymentQueryService;
-import com.example.paymentsystem.presentation.common.ApiResponse;
+import com.example.paymentsystem.shared.presentation.ApiResponse;
 import com.example.paymentsystem.presentation.payment.dto.PaymentResponse;
 import com.example.paymentsystem.presentation.query.dto.OperationsPaymentResponse;
 import com.example.paymentsystem.presentation.query.dto.PageResponse;

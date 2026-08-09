@@ -3,7 +3,7 @@ package com.example.paymentsystem.domain.entity.customer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.paymentsystem.domain.exception.DomainException;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 

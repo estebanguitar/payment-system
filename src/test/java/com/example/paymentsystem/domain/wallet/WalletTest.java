@@ -3,8 +3,8 @@ package com.example.paymentsystem.domain.entity.wallet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.paymentsystem.domain.exception.InsufficientBalanceException;
-import com.example.paymentsystem.domain.exception.InvalidAmountException;
+import com.example.paymentsystem.shared.domain.exception.InsufficientBalanceException;
+import com.example.paymentsystem.shared.domain.exception.InvalidAmountException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
