@@ -36,4 +36,15 @@ class AuditLogFilterTest {
         Assertions.assertThat(captor.getValue().requestPath()).isEqualTo("/api/v1/wallets/{customerId}");
         Assertions.assertThat(captor.getValue().responseStatus()).isEqualTo(404);
     }
+
+    /** API 경로만 감사 대상으로 분류하고 문서·정적 경로는 제외하는지 검증한다. */
+    @Test
+    void filterTargetsOnlyApiPaths() {
+        AuditLogService service = Mockito.mock(AuditLogService.class);
+        AuditLogFilter filter = new AuditLogFilter(service, new AuditValueSanitizer(), new SimpleMeterRegistry());
+
+        Assertions.assertThat(filter.shouldNotFilter(new MockHttpServletRequest("GET", "/api/v1/payments"))).isFalse();
+        Assertions.assertThat(filter.shouldNotFilter(new MockHttpServletRequest("GET", "/v3/api-docs"))).isTrue();
+        Assertions.assertThat(filter.shouldNotFilter(new MockHttpServletRequest("GET", "/swagger-ui.html"))).isTrue();
+    }
 }

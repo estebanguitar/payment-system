@@ -60,10 +60,9 @@ public class AuditLogFilter extends OncePerRequestFilter {
         }
     }
 
-    /** API 외 경로와 Swagger 문서 경로는 감사 수집에서 제외한다. */
+    /** `/api/` 외 모든 경로는 감사 수집에서 제외한다. */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        return !path.startsWith("/api/") || path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui");
+        return !request.getRequestURI().startsWith("/api/");
     }
 }
