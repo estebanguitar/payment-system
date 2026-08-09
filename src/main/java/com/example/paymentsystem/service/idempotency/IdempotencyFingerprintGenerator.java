@@ -1,6 +1,6 @@
 package com.example.paymentsystem.service.idempotency;
 
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.payment.CancelType;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

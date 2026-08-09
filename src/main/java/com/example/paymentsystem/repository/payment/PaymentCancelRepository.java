@@ -1,6 +1,6 @@
-package com.example.paymentsystem.repository.cancellation;
+package com.example.paymentsystem.repository.payment;
 
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,17 +1,18 @@
-package com.example.paymentsystem.service.cancellation;
+package com.example.paymentsystem.service.payment;
 
 import com.example.paymentsystem.common.exception.ApplicationErrorCode;
 import com.example.paymentsystem.common.exception.ApplicationException;
 import com.example.paymentsystem.integration.pg.pg.PgCancelResult;
 import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.payment.Payment;
 import com.example.paymentsystem.domain.payment.PaymentFailureReason;
 import com.example.paymentsystem.domain.pg.PgResponseLog;
+import com.example.paymentsystem.domain.pg.PgOperationType;
 import com.example.paymentsystem.domain.wallet.Wallet;
 import com.example.paymentsystem.domain.wallet.WalletTransaction;
-import com.example.paymentsystem.repository.cancellation.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
 import com.example.paymentsystem.repository.payment.PaymentRepository;
 import com.example.paymentsystem.repository.pg.PgResponseLogRepository;
@@ -90,7 +91,8 @@ public class PaymentCancelProcessingService {
         if (encryptor == null) {
             throw new ApplicationException(ApplicationErrorCode.SYSTEM_ERROR);
         }
-        pgLogRepository.save(PgResponseLog.create(paymentId, result.getPgCancelTransactionId(),
+        pgLogRepository.save(PgResponseLog.create(paymentId, PgOperationType.PAYMENT_CANCEL,
+                result.getPgCancelTransactionId(),
                 result.getResponseCode(), encryptor.encrypt(result.getRawPayload()), now));
     }
 }

@@ -1,4 +1,4 @@
-package com.example.paymentsystem.domain.cancellation;
+package com.example.paymentsystem.domain.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

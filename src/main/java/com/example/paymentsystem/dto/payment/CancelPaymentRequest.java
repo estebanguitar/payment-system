@@ -1,7 +1,7 @@
 package com.example.paymentsystem.dto.payment;
 
-import com.example.paymentsystem.dto.cancellation.PaymentCancelCommand;
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.dto.payment.PaymentCancelCommand;
+import com.example.paymentsystem.domain.payment.CancelType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;

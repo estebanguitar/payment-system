@@ -1,16 +1,16 @@
-package com.example.paymentsystem.service.cancellation;
+package com.example.paymentsystem.service.payment;
 
-import com.example.paymentsystem.dto.cancellation.PaymentCancelCommand;
+import com.example.paymentsystem.dto.payment.PaymentCancelCommand;
 
 import com.example.paymentsystem.service.outbox.PaymentCancelCreatedEvent;
 import com.example.paymentsystem.common.exception.ApplicationErrorCode;
 import com.example.paymentsystem.common.exception.ApplicationException;
 import com.example.paymentsystem.service.idempotency.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.dto.outbox.OutboxEventPayload;
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.payment.Payment;
-import com.example.paymentsystem.repository.cancellation.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
 import com.example.paymentsystem.domain.idempotency.IdempotencyRecord;
 import com.example.paymentsystem.repository.idempotency.IdempotencyRecordRepository;
 import com.example.paymentsystem.domain.idempotency.IdempotencyRequestType;

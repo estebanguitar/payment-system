@@ -1,6 +1,6 @@
 package com.example.paymentsystem.scheduler.outbox;
 
-import com.example.paymentsystem.service.outbox.OutboxRecoveryUseCase;
+import com.example.paymentsystem.service.outbox.OutboxProcessor;
 import com.example.paymentsystem.domain.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
 
     private final PaymentOutboxRepository outboxRepository;
-    private final OutboxRecoveryUseCase recoveryPort;
+    private final OutboxProcessor processor;
     private final OutboxProperties properties;
     private final Clock clock;
 
@@ -42,7 +42,7 @@ public class OutboxScheduler {
 
         for (Long outboxId : candidateIds) {
             try {
-                recoveryPort.recover(outboxId);
+                processor.process(outboxId);
             } catch (RuntimeException exception) {
                 log.warn("아웃박스 복구 요청에 실패했습니다. outboxId={}", outboxId, exception);
             }

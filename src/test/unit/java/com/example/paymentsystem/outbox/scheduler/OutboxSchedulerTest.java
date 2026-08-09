@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.service.outbox.OutboxRecoveryUseCase;
+import com.example.paymentsystem.service.outbox.OutboxProcessor;
 import com.example.paymentsystem.domain.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
@@ -25,7 +25,7 @@ class OutboxSchedulerTest {
     @Test
     void continueRecoveryAfterIndividualFailure() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        OutboxRecoveryUseCase recoveryPort = mock(OutboxRecoveryUseCase.class);
+        OutboxProcessor recoveryPort = mock(OutboxProcessor.class);
         PaymentOutbox first = mock(PaymentOutbox.class);
         PaymentOutbox second = mock(PaymentOutbox.class);
         when(first.getId()).thenReturn(1L);
@@ -35,22 +35,22 @@ class OutboxSchedulerTest {
         when(repository.findByStatusInAndCreatedAtBeforeOrderByCreatedAtAsc(
                 eq(List.of(OutboxStatus.PENDING, OutboxStatus.RETRY)), any(), any(Pageable.class)))
                 .thenReturn(List.of(first, second));
-        doThrow(new RuntimeException("recovery failure")).when(recoveryPort).recover(1L);
+        doThrow(new RuntimeException("recovery failure")).when(recoveryPort).process(1L);
         Clock clock = Clock.fixed(Instant.parse("2026-08-09T01:00:00Z"), ZoneId.of("Asia/Seoul"));
         OutboxScheduler scheduler = new OutboxScheduler(
                 repository, recoveryPort, new OutboxProperties(true, 60_000, 60_000, 50, 5), clock);
 
         scheduler.recoverOrphanedEvents();
 
-        verify(recoveryPort).recover(1L);
-        verify(recoveryPort).recover(2L);
+        verify(recoveryPort).process(1L);
+        verify(recoveryPort).process(2L);
     }
 
     /** 최대 재시도 횟수에 도달한 후보는 복구 처리기로 전달하지 않는지 확인한다. */
     @Test
     void skipCandidateAtRetryLimit() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        OutboxRecoveryUseCase recoveryPort = mock(OutboxRecoveryUseCase.class);
+        OutboxProcessor recoveryPort = mock(OutboxProcessor.class);
         PaymentOutbox exhausted = mock(PaymentOutbox.class);
         when(exhausted.getId()).thenReturn(1L);
         when(exhausted.getRetryCount()).thenReturn(5);
@@ -62,6 +62,6 @@ class OutboxSchedulerTest {
 
         scheduler.recoverOrphanedEvents();
 
-        verify(recoveryPort, org.mockito.Mockito.never()).recover(any());
+        verify(recoveryPort, org.mockito.Mockito.never()).process(any());
     }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.paymentsystem.domain.customer.Customer;
 import com.example.paymentsystem.domain.payment.Payment;
 import com.example.paymentsystem.domain.pg.PgResponseLog;
+import com.example.paymentsystem.domain.pg.PgOperationType;
 import com.example.paymentsystem.domain.wallet.Wallet;
 import com.example.paymentsystem.repository.customer.CustomerRepository;
 import com.example.paymentsystem.domain.idempotency.IdempotencyRecord;
@@ -63,7 +64,8 @@ class RepositoryIntegrationTest {
         Payment payment = paymentRepository.saveAndFlush(
                 Payment.createPending("PAY-" + suffix, customer.getCustomerId(), 10_000, NOW));
         pgResponseLogRepository.saveAndFlush(
-                PgResponseLog.create(payment.getId(), "PG-" + suffix, "0000", "encrypted", NOW));
+                PgResponseLog.create(payment.getId(), PgOperationType.PAYMENT_APPROVAL,
+                        "PG-" + suffix, "0000", "encrypted", NOW));
 
         assertThat(customerRepository.existsByCustomerId(customer.getCustomerId())).isTrue();
         assertThat(walletRepository.findByCustomerId(customer.getCustomerId()))

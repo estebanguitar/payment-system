@@ -1,6 +1,6 @@
 package com.example.paymentsystem.controller.payment;
 
-import com.example.paymentsystem.service.cancellation.PaymentCancelFacade;
+import com.example.paymentsystem.service.payment.PaymentCancelFacade;
 import com.example.paymentsystem.service.payment.PaymentFacade;
 import com.example.paymentsystem.common.response.ApiResponse;
 import com.example.paymentsystem.dto.payment.CancelPaymentRequest;

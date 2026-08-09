@@ -9,6 +9,7 @@ import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.payment.Payment;
 import com.example.paymentsystem.domain.payment.PaymentFailureReason;
 import com.example.paymentsystem.domain.pg.PgResponseLog;
+import com.example.paymentsystem.domain.pg.PgOperationType;
 import com.example.paymentsystem.domain.wallet.Wallet;
 import com.example.paymentsystem.domain.wallet.WalletTransaction;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
@@ -87,6 +88,6 @@ public class PaymentProcessingService {
             throw new ApplicationException(ApplicationErrorCode.SYSTEM_ERROR);
         }
         pgLogRepository.save(PgResponseLog.create(
-                paymentId, transactionId, code, encryptor.encrypt(rawPayload), now));
+                paymentId, PgOperationType.PAYMENT_APPROVAL, transactionId, code, encryptor.encrypt(rawPayload), now));
     }
 }

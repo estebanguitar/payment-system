@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.example.paymentsystem.dto.payment.query.PaymentSearchCondition;
 import com.example.paymentsystem.common.exception.ApplicationErrorCode;
 import com.example.paymentsystem.domain.payment.Payment;
-import com.example.paymentsystem.repository.cancellation.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
 import com.example.paymentsystem.repository.payment.PaymentRepository;
 import com.example.paymentsystem.repository.pg.PgResponseLogRepository;
 import com.example.paymentsystem.repository.wallet.WalletTransactionRepository;

@@ -1,8 +1,8 @@
 package com.example.paymentsystem.dto.payment;
 
 import com.example.paymentsystem.dto.payment.query.PaymentCancelView;
-import com.example.paymentsystem.domain.cancellation.CancelStatus;
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.payment.CancelStatus;
+import com.example.paymentsystem.domain.payment.CancelType;
 import com.example.paymentsystem.domain.payment.PaymentFailureReason;
 import java.time.LocalDateTime;
 

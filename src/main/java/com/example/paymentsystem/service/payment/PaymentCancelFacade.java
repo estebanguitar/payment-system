@@ -1,11 +1,16 @@
-package com.example.paymentsystem.service.cancellation;
+package com.example.paymentsystem.service.payment;
 
-import com.example.paymentsystem.dto.cancellation.PaymentCancelCommand;
-import com.example.paymentsystem.dto.cancellation.PaymentCancelResult;
+import com.example.paymentsystem.dto.payment.PaymentCancelCommand;
+import com.example.paymentsystem.dto.payment.PaymentCancelResult;
 
 import com.example.paymentsystem.service.idempotency.IdempotencyConflictResolver;
 import com.example.paymentsystem.service.idempotency.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.domain.idempotency.IdempotencyRequestType;
+import com.example.paymentsystem.common.exception.ApplicationErrorCode;
+import com.example.paymentsystem.common.exception.ApplicationException;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -15,7 +20,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PaymentCancelFacade {
     private final PaymentCancelCreationService creationService;
-    private final PaymentCancelResultService resultService;
+    private final PaymentCancelRepository cancelRepository;
+    private final PaymentRepository paymentRepository;
     private final IdempotencyConflictResolver conflictResolver;
     private final IdempotencyFingerprintGenerator fingerprintGenerator;
 
@@ -28,6 +34,9 @@ public class PaymentCancelFacade {
             cancelId = conflictResolver.resolve(command.getIdempotencyKey(), IdempotencyRequestType.PAYMENT_CANCEL,
                     fingerprintGenerator.cancel(command.getPaymentId(), command.getCancelType(), command.getAmount()));
         }
-        return resultService.get(cancelId);
+        PaymentCancel cancel = cancelRepository.findById(cancelId)
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorCode.CANCEL_NOT_FOUND));
+        return PaymentCancelResult.from(cancel, paymentRepository.findById(cancel.getPaymentId())
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorCode.PAYMENT_NOT_FOUND)));
     }
 }

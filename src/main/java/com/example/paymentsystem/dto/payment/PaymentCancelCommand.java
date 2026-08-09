@@ -1,6 +1,6 @@
-package com.example.paymentsystem.dto.cancellation;
+package com.example.paymentsystem.dto.payment;
 
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.payment.CancelType;
 import lombok.Builder;
 import lombok.Getter;
 

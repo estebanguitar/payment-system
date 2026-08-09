@@ -2,12 +2,13 @@ package com.example.paymentsystem.architecture.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.domain.cancellation.CancelType;
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.CancelType;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import com.example.paymentsystem.domain.customer.Customer;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.payment.Payment;
 import com.example.paymentsystem.domain.pg.PgResponseLog;
+import com.example.paymentsystem.domain.pg.PgOperationType;
 import com.example.paymentsystem.domain.wallet.Wallet;
 import com.example.paymentsystem.domain.wallet.WalletTransaction;
 import java.time.LocalDateTime;
@@ -44,7 +45,8 @@ class DomainEntityMappingTest {
         WalletTransaction transaction = entityManager.persist(WalletTransaction.refund(
                 wallet.getId(), 1_000, wallet.getBalance(), payment.getId(), cancel.getId(), NOW));
         PgResponseLog pgLog = entityManager.persist(
-                PgResponseLog.create(payment.getId(), "PG-MAPPING", "APPROVED", "encrypted", NOW));
+                PgResponseLog.create(payment.getId(), PgOperationType.PAYMENT_APPROVAL,
+                        "PG-MAPPING", "APPROVED", "encrypted", NOW));
         PaymentOutbox outbox = entityManager.persist(
                 PaymentOutbox.createPaymentRequested(payment.getId(), "PAY-MAPPING", "{}", NOW));
 

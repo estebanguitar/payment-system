@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -28,6 +30,10 @@ public class PgResponseLog {
     @Column(name = "payment_id", nullable = false)
     private Long paymentId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_type", nullable = false, length = 32)
+    private PgOperationType operationType;
+
     @Column(name = "pg_transaction_id", length = 128)
     private String pgTransactionId;
 
@@ -41,10 +47,13 @@ public class PgResponseLog {
     @Column(name = "received_at", nullable = false)
     private LocalDateTime receivedAt;
 
-    private PgResponseLog(Long paymentId, String pgTransactionId, String pgResponseCode,
+    private PgResponseLog(Long paymentId, PgOperationType operationType, String pgTransactionId, String pgResponseCode,
                           String encryptedPayload, LocalDateTime receivedAt) {
         if (paymentId == null || paymentId <= 0) {
             throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "결제 식별자는 필수입니다.");
+        }
+        if (operationType == null) {
+            throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "PG 처리 유형은 필수입니다.");
         }
         if (encryptedPayload == null || encryptedPayload.isBlank()) {
             throw new DomainException(DomainErrorCode.MISSING_ENCRYPTED_PAYLOAD);
@@ -53,6 +62,7 @@ public class PgResponseLog {
             throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "수신 시각은 필수입니다.");
         }
         this.paymentId = paymentId;
+        this.operationType = operationType;
         this.pgTransactionId = pgTransactionId;
         this.pgResponseCode = pgResponseCode;
         this.encryptedPayload = encryptedPayload;
@@ -60,10 +70,10 @@ public class PgResponseLog {
     }
 
     /** 암호화가 완료된 PG 응답을 변경 불가능한 로그로 생성한다. */
-    public static PgResponseLog create(Long paymentId, String pgTransactionId,
+    public static PgResponseLog create(Long paymentId, PgOperationType operationType, String pgTransactionId,
                                        String pgResponseCode, String encryptedPayload,
                                        LocalDateTime receivedAt) {
-        return new PgResponseLog(paymentId, pgTransactionId, pgResponseCode,
+        return new PgResponseLog(paymentId, operationType, pgTransactionId, pgResponseCode,
                 encryptedPayload, receivedAt);
     }
 }

@@ -1,41 +1,25 @@
 package com.example.paymentsystem.service.outbox;
 
-import com.example.paymentsystem.service.payment.PaymentProcessingService;
-import com.example.paymentsystem.dto.payment.PaymentResult;
-import com.example.paymentsystem.service.payment.PaymentResultService;
-import com.example.paymentsystem.integration.pg.pg.PgApprovalCommand;
-import com.example.paymentsystem.integration.pg.pg.PgApprovalResult;
-import com.example.paymentsystem.integration.pg.pg.PgClient;
-import com.example.paymentsystem.integration.pg.pg.PgClientException;
-import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-/** 결제 저장 커밋 후 트랜잭션 없이 PG를 호출하고 결과 반영을 위임한다. */
+/** 결제 커밋 이벤트를 OutboxProcessor에 전달하는 즉시 실행 Adapter다. */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PaymentEventListener {
-    private final PgClient pgClient;
-    private final PaymentResultService resultService;
-    private final PaymentProcessingService processingService;
+    private final OutboxProcessor processor;
 
-    /** 결제 승인 결과를 분류해 별도 결과 반영 트랜잭션으로 전달한다. */
+    /** 결제 커밋 직후 Outbox 처리를 트리거하고 실패는 Scheduler 복구 대상으로 남긴다. */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(PaymentCreatedEvent event) {
-        PaymentResult payment = resultService.get(event.paymentId());
         try {
-            PgApprovalResult result = pgClient.approve(PgApprovalCommand.builder()
-                    .paymentId(payment.getPaymentId()).customerId(payment.getCustomerId())
-                    .amount(payment.getAmount()).idempotencyKey(payment.getIdempotencyKey()).build());
-            if (result.getStatus() == PgResultStatus.APPROVED) {
-                processingService.approve(event.paymentId(), event.outboxId(), result);
-            } else {
-                processingService.reject(event.paymentId(), event.outboxId(), result);
-            }
-        } catch (PgClientException exception) {
-            processingService.failSystem(event.paymentId(), event.outboxId());
+            processor.process(event.outboxId());
+        } catch (RuntimeException exception) {
+            log.warn("결제 Outbox 즉시 처리에 실패했습니다. outboxId={}", event.outboxId(), exception);
         }
     }
 }

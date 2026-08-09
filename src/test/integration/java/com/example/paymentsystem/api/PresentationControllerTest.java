@@ -8,19 +8,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.paymentsystem.dto.cancellation.PaymentCancelResult;
+import com.example.paymentsystem.dto.payment.PaymentCancelResult;
 import com.example.paymentsystem.dto.payment.PaymentResult;
 import com.example.paymentsystem.dto.payment.query.CustomerPaymentView;
 import com.example.paymentsystem.dto.payment.query.OperationsPaymentView;
 import com.example.paymentsystem.dto.common.PageResult;
 import com.example.paymentsystem.dto.wallet.WalletResult;
-import com.example.paymentsystem.service.cancellation.PaymentCancelFacade;
+import com.example.paymentsystem.service.payment.PaymentCancelFacade;
 import com.example.paymentsystem.service.audit.AuditLogService;
 import com.example.paymentsystem.service.payment.PaymentFacade;
 import com.example.paymentsystem.service.payment.PaymentQueryService;
 import com.example.paymentsystem.service.wallet.WalletService;
-import com.example.paymentsystem.domain.cancellation.CancelStatus;
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.payment.CancelStatus;
+import com.example.paymentsystem.domain.payment.CancelType;
 import com.example.paymentsystem.domain.payment.PaymentStatus;
 import com.example.paymentsystem.controller.payment.PaymentController;
 import com.example.paymentsystem.controller.audit.AuditValueSanitizer;

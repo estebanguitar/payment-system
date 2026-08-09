@@ -3,75 +3,70 @@ package com.example.paymentsystem.service.outbox;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.service.outbox.PaymentCancelEventListener;
-import com.example.paymentsystem.service.outbox.PaymentEventListener;
 import com.example.paymentsystem.domain.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
-import com.example.paymentsystem.scheduler.outbox.OutboxProperties;
+import com.example.paymentsystem.domain.payment.Payment;
+import com.example.paymentsystem.integration.pg.pg.PgApprovalResult;
+import com.example.paymentsystem.integration.pg.pg.PgClient;
+import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentRepository;
+import com.example.paymentsystem.scheduler.outbox.OutboxProperties;
+import com.example.paymentsystem.service.payment.PaymentCancelProcessingService;
+import com.example.paymentsystem.service.payment.PaymentProcessingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
-/** 아웃박스 복구와 재시도 상태 갱신 메서드의 모든 이벤트 유형을 검증한다. */
+/** 공통 OutboxProcessor와 재시도 상태 변경을 검증한다. */
 class OutboxServiceTest {
-    /** recover가 결제·취소 INIT 이벤트를 해당 리스너로 전달하고 완료 이벤트는 무시하는지 확인한다. */
+    /** 결제 이벤트의 PG 승인 결과를 결제 처리 서비스로 전달하는지 확인한다. */
     @Test
-    void recoverPaymentCancelAndIgnorePublished() {
-        PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        PaymentEventListener paymentListener = mock(PaymentEventListener.class);
-        PaymentCancelEventListener cancelListener = mock(PaymentCancelEventListener.class);
-        OutboxQueryService queryService = mock(OutboxQueryService.class);
-        OutboxRecoveryService service = new OutboxRecoveryService(queryService, paymentListener, cancelListener,
-                mock(OutboxStatusService.class), new ObjectMapper());
-        PaymentOutbox payment = PaymentOutbox.createPaymentRequested(1L, "K1", "{\"paymentId\":1}", LocalDateTime.now());
-        ReflectionTestUtils.setField(payment, "id", 10L);
-        PaymentOutbox cancel = PaymentOutbox.createPaymentCancelRequested(1L, "K2",
-                "{\"paymentId\":1,\"cancelId\":2}", LocalDateTime.now());
-        ReflectionTestUtils.setField(cancel, "id", 11L);
-        PaymentOutbox published = PaymentOutbox.createPaymentRequested(1L, "K3", "{\"paymentId\":1}", LocalDateTime.now());
-        published.markCompleted(LocalDateTime.now());
-        when(queryService.get(10L)).thenReturn(payment);
-        when(queryService.get(11L)).thenReturn(cancel);
-        when(queryService.get(12L)).thenReturn(published);
-        service.recover(10L); service.recover(11L); service.recover(12L);
-        verify(paymentListener).handle(org.mockito.ArgumentMatchers.any());
-        verify(cancelListener).handle(org.mockito.ArgumentMatchers.any());
+    void processApprovedPayment() {
+        PaymentOutboxRepository outboxes = mock(PaymentOutboxRepository.class);
+        PaymentRepository payments = mock(PaymentRepository.class);
+        PgClient pgClient = mock(PgClient.class);
+        PaymentProcessingService processing = mock(PaymentProcessingService.class);
+        OutboxStatusService status = mock(OutboxStatusService.class);
+        PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(
+                1L, "K", "{\"paymentId\":1}", LocalDateTime.now());
+        ReflectionTestUtils.setField(outbox, "id", 2L);
+        Payment payment = Payment.createPending("K", "C", 100, LocalDateTime.now());
+        ReflectionTestUtils.setField(payment, "id", 1L);
+        PgApprovalResult result = PgApprovalResult.builder().status(PgResultStatus.APPROVED).build();
+        when(outboxes.findById(2L)).thenReturn(Optional.of(outbox));
+        when(payments.findById(1L)).thenReturn(Optional.of(payment));
+        when(pgClient.approve(org.mockito.ArgumentMatchers.any())).thenReturn(result);
+        OutboxProcessor processor = new OutboxProcessor(outboxes, payments, mock(PaymentCancelRepository.class),
+                pgClient, processing, mock(PaymentCancelProcessingService.class), status, new ObjectMapper());
+
+        processor.process(2L);
+
+        verify(processing).approve(1L, 2L, result);
     }
 
-    /** recover가 잘못된 payload를 시스템 오류로 처리하는지 확인한다. */
+    /** 손상된 payload는 실패 횟수를 기록하고 오류를 반환하는지 확인한다. */
     @Test
     void rejectInvalidPayload() {
-        PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
+        PaymentOutboxRepository outboxes = mock(PaymentOutboxRepository.class);
         PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(1L, "K", "{}", LocalDateTime.now());
-        OutboxQueryService queryService = mock(OutboxQueryService.class);
-        when(queryService.get(1L)).thenReturn(outbox);
+        when(outboxes.findById(1L)).thenReturn(Optional.of(outbox));
         OutboxStatusService status = mock(OutboxStatusService.class);
-        OutboxRecoveryService service = new OutboxRecoveryService(queryService, mock(PaymentEventListener.class),
-                mock(PaymentCancelEventListener.class), status, new ObjectMapper());
-        assertThatThrownBy(() -> service.recover(1L)).isInstanceOf(RuntimeException.class);
+        OutboxProcessor processor = new OutboxProcessor(outboxes, mock(PaymentRepository.class),
+                mock(PaymentCancelRepository.class), mock(PgClient.class), mock(PaymentProcessingService.class),
+                mock(PaymentCancelProcessingService.class), status, new ObjectMapper());
+
+        assertThatThrownBy(() -> processor.process(1L)).isInstanceOf(RuntimeException.class);
         verify(status).recordFailure(1L);
     }
 
-    /** OutboxQueryService.get이 아웃박스를 반환하고 미존재 ID를 시스템 오류로 변환하는지 확인한다. */
-    @Test
-    void queryOutbox() {
-        PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(1L, "K", "{}", LocalDateTime.now());
-        when(repository.findById(1L)).thenReturn(Optional.of(outbox));
-        OutboxQueryService service = new OutboxQueryService(repository);
-        assertThat(service.get(1L)).isSameAs(outbox);
-        assertThatThrownBy(() -> service.get(2L)).isInstanceOf(RuntimeException.class);
-    }
-
-    /** recordFailure가 횟수를 증가시키고 한도 도달 시 FAILED로 전환하는지 확인한다. */
+    /** 재시도 한도 도달 시 Outbox를 FAILED로 전환하는지 확인한다. */
     @Test
     void recordFailureAndMarkFailed() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
@@ -79,7 +74,9 @@ class OutboxServiceTest {
         when(repository.findByIdWithLock(1L)).thenReturn(Optional.of(outbox));
         OutboxStatusService service = new OutboxStatusService(repository,
                 new OutboxProperties(false, 1, 1, 1, 1));
+
         service.recordFailure(1L);
+
         assertThat(outbox.getStatus()).isEqualTo(OutboxStatus.FAILED);
         assertThat(outbox.getRetryCount()).isEqualTo(1);
     }

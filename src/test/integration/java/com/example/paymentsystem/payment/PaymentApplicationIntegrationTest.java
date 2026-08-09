@@ -2,16 +2,16 @@ package com.example.paymentsystem.architecture.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.dto.cancellation.PaymentCancelCommand;
-import com.example.paymentsystem.dto.cancellation.PaymentCancelResult;
+import com.example.paymentsystem.dto.payment.PaymentCancelCommand;
+import com.example.paymentsystem.dto.payment.PaymentCancelResult;
 import com.example.paymentsystem.dto.payment.PaymentCommand;
 import com.example.paymentsystem.dto.payment.PaymentResult;
 import com.example.paymentsystem.dto.wallet.WalletCommand;
-import com.example.paymentsystem.service.cancellation.PaymentCancelFacade;
+import com.example.paymentsystem.service.payment.PaymentCancelFacade;
 import com.example.paymentsystem.service.payment.PaymentFacade;
 import com.example.paymentsystem.service.wallet.WalletService;
-import com.example.paymentsystem.domain.cancellation.CancelStatus;
-import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.payment.CancelStatus;
+import com.example.paymentsystem.domain.payment.CancelType;
 import com.example.paymentsystem.domain.customer.Customer;
 import com.example.paymentsystem.domain.payment.PaymentStatus;
 import com.example.paymentsystem.repository.customer.CustomerRepository;

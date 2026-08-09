@@ -1,4 +1,4 @@
-package com.example.paymentsystem.domain.cancellation;
+package com.example.paymentsystem.domain.payment;
 
 import com.example.paymentsystem.common.exception.DomainErrorCode;
 import com.example.paymentsystem.common.exception.DomainException;

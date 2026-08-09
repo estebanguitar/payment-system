@@ -13,7 +13,7 @@ import com.example.paymentsystem.common.exception.ApplicationException;
 import com.example.paymentsystem.integration.pg.pg.PgClientException;
 import com.example.paymentsystem.integration.pg.pg.PgErrorType;
 import com.example.paymentsystem.service.customer.CustomerQueryService;
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import com.example.paymentsystem.domain.customer.Customer;
 import com.example.paymentsystem.domain.wallet.WalletTransaction;
 import com.example.paymentsystem.repository.customer.CustomerRepository;

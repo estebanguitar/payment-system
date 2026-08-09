@@ -1,4 +1,4 @@
-package com.example.paymentsystem.service.cancellation;
+package com.example.paymentsystem.service.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -7,12 +7,12 @@ import static org.mockito.Mockito.when;
 import com.example.paymentsystem.integration.pg.pg.PgCancelResult;
 import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
 import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
-import com.example.paymentsystem.domain.cancellation.CancelType;
-import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.payment.CancelType;
+import com.example.paymentsystem.domain.payment.PaymentCancel;
 import com.example.paymentsystem.domain.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.payment.PaymentFailureReason;
-import com.example.paymentsystem.repository.cancellation.PaymentCancelRepository;
+import com.example.paymentsystem.repository.payment.PaymentCancelRepository;
 import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
 import com.example.paymentsystem.repository.payment.PaymentRepository;
 import com.example.paymentsystem.repository.pg.PgResponseLogRepository;

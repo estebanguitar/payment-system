@@ -6,6 +6,9 @@ import com.example.paymentsystem.dto.payment.PaymentResult;
 import com.example.paymentsystem.service.idempotency.IdempotencyConflictResolver;
 import com.example.paymentsystem.service.idempotency.IdempotencyFingerprintGenerator;
 import com.example.paymentsystem.domain.idempotency.IdempotencyRequestType;
+import com.example.paymentsystem.common.exception.ApplicationErrorCode;
+import com.example.paymentsystem.common.exception.ApplicationException;
+import com.example.paymentsystem.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PaymentFacade {
     private final PaymentCreationService creationService;
-    private final PaymentResultService resultService;
+    private final PaymentRepository paymentRepository;
     private final IdempotencyConflictResolver conflictResolver;
     private final IdempotencyFingerprintGenerator fingerprintGenerator;
 
@@ -28,6 +31,7 @@ public class PaymentFacade {
             paymentId = conflictResolver.resolve(command.getIdempotencyKey(), IdempotencyRequestType.PAYMENT,
                     fingerprintGenerator.payment(command.getCustomerId(), command.getAmount()));
         }
-        return resultService.get(paymentId);
+        return PaymentResult.from(paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorCode.PAYMENT_NOT_FOUND)));
     }
 }
