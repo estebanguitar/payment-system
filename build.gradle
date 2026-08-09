@@ -15,6 +15,13 @@ java {
 	}
 }
 
+sourceSets {
+	test {
+		// 단위 테스트와 통합 테스트를 물리적으로 구분하되 하나의 검증 태스크에서 실행한다.
+		java.srcDirs = ['src/test/unit/java', 'src/test/integration/java']
+	}
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
