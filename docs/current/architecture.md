@@ -587,3 +587,40 @@ MSA 전환은 부하 테스트에서 확인된 독립 확장 필요성, 장애 �
 - 경량 대사 스케줄러는 읽기 비교와 Break 생성만 수행하며 업무 데이터를 자동 보정하지 않는다.
 - 횡단 관심사 중 감사 수집 지원 코드는 `common.audit`, 전역 HTTP 추적 ID는 `common.web`에 둔다.
 - PG 계약과 가상 구현은 `integration.pg`, 암호화 계약·구현·설정·예외는 `integration.pg.security`에 둔다.
+# Outbox 처리 및 PG 보상 정합성 전략 (2026-08-09)
+
+## 처리 단계
+
+`PENDING/RETRY` → `PROCESSING` 선점 → PG 승인 → `PG_APPROVED` 결과 영속화 → 내부 지갑·결제 반영 → `COMPLETED`
+
+- 선점은 별도 짧은 트랜잭션에서 비관적 잠금으로 수행하고 커밋 후 PG를 호출한다.
+- `processingToken`을 fencing token으로 사용한다. 완료·재시도·실패 전이는 현재 토큰 소유자만 수행하여, 회수된 작업의 이전 JVM 응답이 새 처리 결과를 덮어쓰지 못하게 한다.
+- `processingStartedAt`이 임계값보다 오래된 `PROCESSING`은 lease 만료로 판단한다.
+- PG 승인 응답과 암호화 원문, PG 거래 ID, Outbox 단계는 별도 트랜잭션으로 먼저 저장한다. 내부 반영 실패 시 `PG_APPROVED` 단계부터 재개한다.
+- 외부 호출 직후 JVM이 종료되어 승인 결과를 저장하지 못하는 마지막 불확실 구간은 동일 PG 멱등 키 재요청으로 수렴한다. PG는 같은 키에 최초 거래 결과와 거래 ID를 반환해야 한다.
+- 이는 PG가 승인·보상 요청의 멱등 키를 신뢰 경계 내부에서 보장한다는 명시적 가정이다. PG가 키를 무시하거나 보존 기간이 내부 재시도 기간보다 짧으면 이중 승인 가능성이 남으므로, 실제 어댑터는 지원 여부와 키 보존 기간을 검증한 경우에만 운영에 사용할 수 있다.
+- 내부 반영은 결제 행 잠금과 `wallet_transaction.idempotency_key`의 기존 고유 제약을 함께 사용한다. 결제 차감 원장에는 결제 ID 기반의 결정적 키를 저장하며, 같은 PG 거래 결과가 다시 전달되어도 기존 원장이 있으면 추가 차감하지 않고 저장된 결과로 수렴한다.
+
+## 오류 분기
+
+| 상황 | 결제 | Outbox/단계 | 후속 처리 |
+|---|---|---|---|
+| PG 업무 거절 | `FAILED/EXTERNAL_PAYMENT_REJECTED` | `COMPLETED` | 없음 |
+| PG 확정 기술 실패 | `FAILED/SYSTEM_ERROR` | `FAILED` | 운영 조회 |
+| PG TIMEOUT | 변경 없음 | `RETRY`, 기존 단계 유지 | 동일 멱등 키 재시도, PG·내부 결과 단일화 |
+| PG 승인 후 내부 반영 성공 | `COMPLETED` | `COMPLETED` | 없음 |
+| PG 승인 후 잔액 부족 | 확정 전 유지 | `COMPENSATION_REQUIRED` | PG 보상 취소 |
+| 보상 성공 | `FAILED/INSUFFICIENT_BALANCE` | `COMPLETED` | 승인·보상 PG 로그 보존 |
+| 보상 확정 실패/한도 초과 | `FAILED/COMPENSATION_FAILED` | `FAILED` | 대사 Break 생성·운영 확인 |
+| 보상 TIMEOUT | 확정 전 유지 | `RETRY`, `COMPENSATION_REQUIRED` 유지 | 보상만 동일 키 재시도 |
+
+고객 취소와 승인 직후 보상 취소는 목적과 상태 전이가 다르므로 PG 계약과 로그 operation type을 구분한다.
+
+## 보상 TIMEOUT 수렴
+
+`COMPENSATION_REQUIRED` → 동일 보상 멱등 키 재요청 → PG의 최초 보상 결과·거래 ID 재반환 → 내부 결과 한 번 반영
+
+- 보상 성공 로그는 PG 보상 거래 ID로 중복 저장을 방지한다.
+- 잔액 부족 보상에서는 지갑 차감이 커밋되지 않았으므로 환불 거래를 새로 만들지 않는다. 결제 실패 상태와 보상 성공 로그만 한 번 확정한다.
+- 내부 지갑 거래가 이미 존재하는 다른 보상 시나리오는 원거래와 보상 멱등 키를 기준으로 지갑 증감을 한 번만 반영한다.
+- 보상 결과 저장 전 JVM이 종료된 경우에도 같은 키로 재호출하며, PG의 멱등성 가정이 깨지면 자동 수렴을 보장할 수 없다.

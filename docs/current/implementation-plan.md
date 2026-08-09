@@ -220,3 +220,91 @@ com.example.paymentsystem
 - `rg`로 이전 패키지 참조가 남지 않았는지 확인한다.
 - `clean test jacocoTestReport bootJar`와 `git diff --check`를 통과한다.
 - API, 암호화 포맷, 설정 키, 데이터베이스 스키마와 런타임 동작은 변경하지 않는다.
+# Outbox 선점·PG 결과 영속화·보상 취소 구현계획 (승인 대기)
+
+## 1. 현재 코드 문제 교정
+
+- `PaymentProcessingService.failSystem()`과 취소 처리의 동명 메서드에서 `markCompleted()`를 제거한다.
+- `OutboxProcessor`가 `PgClientException.errorType`을 확인하여 TIMEOUT과 확정 실패를 분리한다.
+- 최초 `findById()` 확인 후 PG를 호출하는 흐름을 제거하고 반드시 선점 서비스의 결과가 있을 때만 처리한다.
+- PG 승인 후 내부 처리 실패를 바깥 catch의 일반 `recordFailure()`로만 환원하지 않고 현재 처리 단계를 유지한다.
+
+## 2. 도메인·DDL
+
+- `OutboxStatus`에 `PROCESSING`을 추가한다.
+- `PaymentOutbox`에 다음 필드를 추가한다.
+  - `processingStage`: `PG_REQUEST`, `PG_APPROVED`, `COMPENSATION_REQUIRED`
+  - `processingStartedAt`: lease 시작 시각
+  - `processingToken`: 현재 처리자 fencing token
+  - `pgTransactionId`, `pgResponseCode`, `encryptedPgPayload`: 승인 후 내부 처리 재개에 필요한 PG 결과 스냅샷
+- `claim(now, token)`, `reclaim(now, token)`, `recordPgApproved(...)`, `requireOwner(token)`, `recordFailure(...)`, `markCompleted(...)`, `markFailed(...)` 상태 전이를 추가하고 허용 상태를 명시한다.
+- `PaymentFailureReason.COMPENSATION_FAILED`, `PgOperationType.PAYMENT_COMPENSATION`, `ReconciliationBreakType.PAYMENT_COMPENSATION_FAILED`를 추가한다.
+- 기존 `wallet_transaction.idempotency_key` 고유 제약을 결제 차감에도 사용한다. 결제 차감 키는 결제 ID에서 결정적으로 생성하고, 충전 및 취소 환불의 기존 멱등 정책은 유지한다.
+- `pg_response_log`에는 `(operation_type, pg_transaction_id)` 고유 제약을 추가하여 동일 승인·보상 결과의 로그 중복을 막는다.
+- Flyway `V10`에서 Outbox 처리 단계·시각·토큰·PG 결과 컬럼을 추가하며 각 컬럼의 `COMMENT`를 컬럼 선언에 인라인으로 작성한다.
+
+## 3. 저장소와 선점 서비스
+
+- `PaymentOutboxRepository.findByIdWithLock()`을 선점 진입점으로 사용한다.
+- 스케줄러 조회를 다음 두 쿼리로 분리한다.
+  - 오래된 `PENDING/RETRY`
+  - `processing_started_at`이 lease 임계값보다 오래된 `PROCESSING`
+- `OutboxClaimService`를 추가하고 `REQUIRES_NEW` 트랜잭션에서 잠금 조회, 상태 검증, UUID 토큰 발급, `PROCESSING` 전이를 커밋한다.
+- 상태 저장 메서드는 outbox ID와 processing token을 함께 받아 소유권을 검증한다. `RETRY/COMPLETED/FAILED` 전이 시 lease 시각과 token을 비우되 처리 단계와 저장된 PG 결과는 재개 정책에 따라 유지한다.
+
+## 4. PG 계약과 오류 정책
+
+- `PgErrorType.ERROR`를 의미가 명확한 `CONFIRMED_FAILURE`로 변경하고 `TIMEOUT`을 유지한다.
+- PG 승인 재시도는 최초 요청과 동일한 결제 멱등 키를 반드시 사용한다. `FakePgClient`도 멱등 키별 최초 승인 결과와 거래 ID를 재사용하여 중복 승인을 생성하지 않는다.
+- `PgClient` 계약 주석과 아키텍처 문서에 “PG가 승인·보상 멱등 키별 최초 결과를 재반환한다”는 외부 시스템 가정을 명시한다. 실제 PG 어댑터는 이 가정을 검증하지 못하면 활성화하지 않는다.
+- `PgClient`에 승인 직후 보상 전용 `compensate(PgCompensationCommand)`를 추가한다. 고객 취소 API와 모델을 재사용하지 않는다.
+- 보상 멱등 키는 결제 멱등 키에서 결정적으로 생성한다(예: `<payment-key>:compensation`).
+- `FakePgClient`는 승인, 거절, TIMEOUT, 확정 실패와 보상 성공·거절·TIMEOUT을 결정적으로 재현한다.
+
+## 5. OutboxProcessor 단계 실행
+
+1. `claim(outboxId)`가 반환한 토큰과 현재 단계를 확보한다. 선점 실패 시 조용히 종료한다.
+2. `PG_REQUEST`이면 PG 승인 호출:
+   - 거절: 결제 실패·PG 로그·Outbox 완료를 한 트랜잭션으로 반영한다.
+   - 확정 기술 실패: 결제 `FAILED/SYSTEM_ERROR`, Outbox `FAILED`로 반영한다.
+   - TIMEOUT: 결제는 변경하지 않고 `RETRY`로 전환하며 동일 멱등 키로 승인 단계를 재시도한다.
+   - 승인: 승인 결과와 암호화 원문을 저장하고 단계를 `PG_APPROVED`로 전환한다.
+3. `PG_APPROVED`이면 지갑 잠금 후 차감과 결제 완료를 시도한다.
+   - 성공: Outbox를 완료한다.
+   - 잔액 부족: 결제를 아직 완료/실패로 확정하지 않고 단계를 `COMPENSATION_REQUIRED`로 저장한다.
+   - 일시적 내부 실패: 승인 결과를 유지한 채 `PG_APPROVED` 단계로 재시도한다.
+4. `COMPENSATION_REQUIRED`이면 승인 거래에 대한 보상 취소만 호출한다.
+   - 성공: 보상 PG 로그 저장, 결제 `FAILED/INSUFFICIENT_BALANCE`, Outbox 완료.
+   - 확정 실패: 결제 `FAILED/COMPENSATION_FAILED`, Outbox 실패, 대사 Break 생성.
+   - TIMEOUT: 같은 보상 멱등 키로 보상 단계만 재시도.
+   - 동일 결과 재수신: PG 보상 거래 ID와 내부 반영 멱등 키를 확인하고 보상 로그·결제 상태·필요한 지갑 반영을 한 번만 커밋.
+
+## 5.1 내부 이중 결제 방지
+
+- 내부 승인 반영은 결제 행을 잠그고 `PENDING` 또는 아직 차감되지 않은 상태인지 확인한다.
+- `wallet_transaction`에서 같은 결제 차감 멱등 키의 `PAYMENT` 거래가 이미 존재하면 지갑을 다시 차감하지 않는다.
+- 데이터베이스 고유 제약을 최종 방어선으로 사용한다. 제약 충돌 트랜잭션은 롤백하고 별도 트랜잭션에서 기존 거래와 결제 상태를 재조회하여 성공 결과로 수렴한다.
+- 같은 Outbox가 TIMEOUT 후 재실행되어 동일 PG 승인 결과를 받더라도 PG 거래 로그는 동일 PG 거래 ID 기준으로 중복 저장하지 않는다.
+- 보상 TIMEOUT 후 동일 결과를 다시 받아도 보상 PG 로그와 내부 상태 전이, 필요한 지갑 거래는 각각 한 번만 반영한다.
+- PG 멱등 키가 달라지는 요청은 재시도가 아니라 별도 거래로 간주하므로 Outbox가 임의로 키를 재생성하지 못하게 한다.
+
+## 6. Scheduler 및 설정
+
+- 기존 `orphan-threshold`를 PROCESSING lease 만료 기준으로 사용하고 명칭을 문서화한다.
+- Scheduler는 일반 후보와 stale PROCESSING ID만 조회하고 실제 선점 판단은 `OutboxClaimService`에 위임한다.
+- 재시도 한도 도달 시 현재 단계에 따라 실패 사유를 결정한다. 보상 단계 한도 초과는 반드시 보상 실패 Break를 남긴다.
+
+## 7. 테스트
+
+- Listener와 Scheduler가 같은 ID를 동시에 호출해도 PG 호출이 한 번만 발생하는 동시성 통합 테스트.
+- stale PROCESSING 회수 및 아직 lease가 유효한 PROCESSING 미회수 테스트.
+- 이전 token 처리자가 회수 이후 완료 상태를 덮어쓰지 못하는 fencing 테스트.
+- PG 확정 실패는 최종 실패, TIMEOUT은 재시도로 분기되는 단위 테스트.
+- PG TIMEOUT 후 동일 멱등 키 재호출 시 PG 거래 ID가 같고 지갑 차감 및 `PAYMENT` 원장이 한 건만 생성되는 통합 테스트.
+- 동일 결제 내부 반영을 동시에 호출해도 데이터베이스 고유 제약과 결제 잠금으로 한 번만 차감되는 동시성 테스트.
+- PG 승인 결과 저장 후 내부 DB 예외가 발생해도 다음 실행에서 PG 승인 API를 호출하지 않는 테스트.
+- 잔액 부족 시 보상 성공, 보상 거절, 보상 TIMEOUT, 보상 재시도 한도 초과 테스트.
+- 보상 TIMEOUT 후 같은 멱등 키로 재호출하면 동일 보상 거래 ID가 반환되고 보상 로그와 내부 상태·지갑 반영이 중복되지 않는 통합 테스트.
+- PG가 멱등 키별 동일 결과를 반환한다는 가상 PG 계약 테스트.
+- 고객 취소 흐름에 회귀가 없는 테스트.
+- 전체 `clean test jacocoTestReport bootJar`, Flyway 마이그레이션, `git diff --check` 검증.
