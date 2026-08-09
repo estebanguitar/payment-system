@@ -2,18 +2,18 @@ package com.example.paymentsystem.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.application.dto.cancel.PaymentCancelCommand;
-import com.example.paymentsystem.application.dto.cancel.PaymentCancelResult;
-import com.example.paymentsystem.application.dto.payment.PaymentCommand;
-import com.example.paymentsystem.application.dto.payment.PaymentResult;
+import com.example.paymentsystem.cancellation.application.dto.PaymentCancelCommand;
+import com.example.paymentsystem.cancellation.application.dto.PaymentCancelResult;
+import com.example.paymentsystem.payment.application.dto.PaymentCommand;
+import com.example.paymentsystem.payment.application.dto.PaymentResult;
 import com.example.paymentsystem.wallet.application.dto.WalletCommand;
-import com.example.paymentsystem.application.service.cancel.PaymentCancelFacade;
-import com.example.paymentsystem.application.service.payment.PaymentFacade;
+import com.example.paymentsystem.cancellation.application.service.PaymentCancelFacade;
+import com.example.paymentsystem.payment.application.service.PaymentFacade;
 import com.example.paymentsystem.wallet.application.service.WalletService;
-import com.example.paymentsystem.domain.entity.cancel.CancelStatus;
-import com.example.paymentsystem.domain.entity.cancel.CancelType;
+import com.example.paymentsystem.cancellation.domain.CancelStatus;
+import com.example.paymentsystem.cancellation.domain.CancelType;
 import com.example.paymentsystem.customer.domain.Customer;
-import com.example.paymentsystem.domain.entity.payment.PaymentStatus;
+import com.example.paymentsystem.payment.domain.PaymentStatus;
 import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;

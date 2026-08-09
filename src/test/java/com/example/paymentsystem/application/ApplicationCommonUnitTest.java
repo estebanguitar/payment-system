@@ -6,14 +6,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.example.paymentsystem.shared.application.dto.PageResult;
-import com.example.paymentsystem.application.dto.query.PaymentCancelView;
-import com.example.paymentsystem.application.dto.query.WalletTransactionView;
+import com.example.paymentsystem.payment.application.dto.query.PaymentCancelView;
+import com.example.paymentsystem.payment.application.dto.query.WalletTransactionView;
 import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.pg.application.port.out.pg.PgClientException;
 import com.example.paymentsystem.pg.application.port.out.pg.PgErrorType;
 import com.example.paymentsystem.customer.application.CustomerQueryService;
-import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
+import com.example.paymentsystem.cancellation.domain.PaymentCancel;
 import com.example.paymentsystem.customer.domain.Customer;
 import com.example.paymentsystem.wallet.domain.WalletTransaction;
 import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;

@@ -2,18 +2,18 @@ package com.example.paymentsystem.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.domain.entity.cancel.CancelType;
-import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
+import com.example.paymentsystem.cancellation.domain.CancelType;
+import com.example.paymentsystem.cancellation.domain.PaymentCancel;
 import com.example.paymentsystem.customer.domain.Customer;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
-import com.example.paymentsystem.domain.entity.payment.Payment;
+import com.example.paymentsystem.payment.domain.Payment;
 import com.example.paymentsystem.wallet.domain.Wallet;
 import com.example.paymentsystem.wallet.domain.WalletTransaction;
-import com.example.paymentsystem.infrastructure.repository.cancel.PaymentCancelRepository;
+import com.example.paymentsystem.cancellation.infrastructure.repository.PaymentCancelRepository;
 import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
-import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
+import com.example.paymentsystem.payment.infrastructure.repository.PaymentRepository;
 import com.example.paymentsystem.wallet.infrastructure.repository.WalletRepository;
 import com.example.paymentsystem.wallet.infrastructure.repository.WalletTransactionRepository;
 import java.time.LocalDateTime;

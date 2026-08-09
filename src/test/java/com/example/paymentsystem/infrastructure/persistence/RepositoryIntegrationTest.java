@@ -3,14 +3,14 @@ package com.example.paymentsystem.infrastructure.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.paymentsystem.customer.domain.Customer;
-import com.example.paymentsystem.domain.entity.payment.Payment;
+import com.example.paymentsystem.payment.domain.Payment;
 import com.example.paymentsystem.pg.domain.PgResponseLog;
 import com.example.paymentsystem.wallet.domain.Wallet;
 import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
 import com.example.paymentsystem.idempotency.domain.IdempotencyRecord;
 import com.example.paymentsystem.idempotency.infrastructure.repository.IdempotencyRecordRepository;
 import com.example.paymentsystem.idempotency.domain.IdempotencyRequestType;
-import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
+import com.example.paymentsystem.payment.infrastructure.repository.PaymentRepository;
 import com.example.paymentsystem.pg.infrastructure.repository.PgResponseLogRepository;
 import com.example.paymentsystem.wallet.infrastructure.repository.WalletRepository;
 import java.time.LocalDateTime;

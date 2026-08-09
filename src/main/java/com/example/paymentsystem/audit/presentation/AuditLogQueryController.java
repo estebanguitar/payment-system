@@ -4,7 +4,7 @@ import com.example.paymentsystem.audit.application.AuditLogService;
 import com.example.paymentsystem.audit.presentation.dto.AuditLogResponse;
 import com.example.paymentsystem.audit.presentation.dto.AuditLogSearchRequest;
 import com.example.paymentsystem.shared.presentation.ApiResponse;
-import com.example.paymentsystem.presentation.query.dto.PageResponse;
+import com.example.paymentsystem.payment.presentation.query.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

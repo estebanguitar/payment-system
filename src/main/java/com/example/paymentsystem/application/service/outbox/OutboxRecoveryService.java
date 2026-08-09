@@ -1,10 +1,10 @@
 package com.example.paymentsystem.application.service.outbox;
 
 import com.example.paymentsystem.application.dto.outbox.OutboxEventPayload;
-import com.example.paymentsystem.application.event.PaymentCancelCreatedEvent;
-import com.example.paymentsystem.application.event.PaymentCancelEventListener;
-import com.example.paymentsystem.application.event.PaymentCreatedEvent;
-import com.example.paymentsystem.application.event.PaymentEventListener;
+import com.example.paymentsystem.cancellation.application.event.PaymentCancelCreatedEvent;
+import com.example.paymentsystem.cancellation.application.event.PaymentCancelEventListener;
+import com.example.paymentsystem.payment.application.event.PaymentCreatedEvent;
+import com.example.paymentsystem.payment.application.event.PaymentEventListener;
 import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import com.example.paymentsystem.application.port.in.outbox.OutboxRecoveryUseCase;

@@ -2,7 +2,7 @@ package com.example.paymentsystem.idempotency.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.domain.entity.cancel.CancelType;
+import com.example.paymentsystem.cancellation.domain.CancelType;
 import org.junit.jupiter.api.Test;
 
 /** 멱등 지문의 결정성과 업무 유형 분리를 검증한다. */

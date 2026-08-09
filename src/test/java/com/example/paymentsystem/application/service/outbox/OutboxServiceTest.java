@@ -7,8 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.application.event.PaymentCancelEventListener;
-import com.example.paymentsystem.application.event.PaymentEventListener;
+import com.example.paymentsystem.cancellation.application.event.PaymentCancelEventListener;
+import com.example.paymentsystem.payment.application.event.PaymentEventListener;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.infrastructure.outbox.OutboxProperties;
