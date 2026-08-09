@@ -585,3 +585,5 @@ MSA 전환은 부하 테스트에서 확인된 독립 확장 필요성, 장애 �
 - `PaymentEventListener`와 `PaymentCancelEventListener`는 커밋 후 즉시 실행을 요청하는 어댑터이며, 실제 PG 처리 책임은 `OutboxProcessor`가 가진다.
 - `OutboxScheduler`는 동일한 `OutboxProcessor`를 호출하여 `PENDING/RETRY` 이벤트만 복구한다.
 - 경량 대사 스케줄러는 읽기 비교와 Break 생성만 수행하며 업무 데이터를 자동 보정하지 않는다.
+- 횡단 관심사 중 감사 수집 지원 코드는 `common.audit`, 전역 HTTP 추적 ID는 `common.web`에 둔다.
+- PG 계약과 가상 구현은 `integration.pg`, 암호화 계약·구현·설정·예외는 `integration.pg.security`에 둔다.

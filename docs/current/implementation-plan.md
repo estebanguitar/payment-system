@@ -186,3 +186,37 @@ com.example.paymentsystem
 - Listener는 즉시 처리 트리거, Scheduler는 복구 트리거로 제한한다.
 - 경량 대사 도메인·저장소·서비스·스케줄러·조회 API와 Flyway DDL을 추가한다.
 - 과거 문서는 `docs/archive`, 현재 기준 문서는 `docs/current`로 구분한다.
+# 공통 웹·PG 연동 패키지 정리 계획 (승인·구현 완료)
+
+## 목적
+
+레이어 이름과 실제 책임이 어긋난 패키지를 정리하고, 중복된 `integration.pg.pg` 경로를 제거한다. 기능과 빈 이름은 변경하지 않는 순수 패키지 리팩터링으로 수행한다.
+
+## 코드 수준 변경
+
+1. 감사 로그 웹 지원 코드를 `controller.audit`에서 `common.audit`로 이동한다.
+   - `AuditLogFilter`
+   - `AuditRequestContext`
+   - `AuditValueSanitizer`
+   - 감사 로그 전용 필터·컨텍스트·마스킹이라는 공통 횡단 관심사 책임을 유지한다.
+2. `TraceIdFilter`는 감사 로그와 분리하여 `common.web`으로 이동한다.
+   - 모든 HTTP 요청의 추적 ID를 생성·전파하는 전역 웹 관심사로 정의한다.
+   - `AuditLogFilter`는 `common.web.TraceIdFilter`를 import하여 기존 request attribute 계약을 유지한다.
+3. `integration.pg.pg`의 타입을 한 단계 위인 `integration.pg`로 이동한다.
+   - `PgClient`, Command/Result, 상태·오류 타입과 예외를 모두 포함한다.
+   - `FakePgClient`, 결제 처리 서비스, `OutboxProcessor`, 테스트의 import를 일괄 수정한다.
+4. PG 암호화 구현과 설정을 `integration.pg.security`로 이동한다.
+   - `AesGcmPayloadEncryptor`
+   - `EncryptionException`
+   - `PaymentSecurityProperties`
+   - 기존 `PayloadEncryptor`와 같은 패키지에 두어 암호화 계약·구현·설정·예외를 응집한다.
+   - `InfrastructureConfiguration`과 관련 테스트의 import를 수정한다.
+5. 이동 후 비어 있는 `controller.audit`, `integration.pg.pg` 패키지 디렉터리를 제거한다.
+
+## 테스트 및 완료 기준
+
+- 감사 로그 필터 단위·통합 테스트의 패키지와 경로를 새 운영 코드 구조에 맞춘다.
+- PG 클라이언트 및 암호화 단위 테스트의 package/import를 새 경로에 맞춘다.
+- `rg`로 이전 패키지 참조가 남지 않았는지 확인한다.
+- `clean test jacocoTestReport bootJar`와 `git diff --check`를 통과한다.
+- API, 암호화 포맷, 설정 키, 데이터베이스 스키마와 런타임 동작은 변경하지 않는다.
