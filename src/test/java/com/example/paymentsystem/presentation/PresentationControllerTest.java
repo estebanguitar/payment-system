@@ -15,6 +15,7 @@ import com.example.paymentsystem.application.dto.query.OperationsPaymentView;
 import com.example.paymentsystem.application.dto.query.PageResult;
 import com.example.paymentsystem.application.dto.wallet.WalletResult;
 import com.example.paymentsystem.application.service.cancel.PaymentCancelFacade;
+import com.example.paymentsystem.application.service.audit.AuditLogService;
 import com.example.paymentsystem.application.service.payment.PaymentFacade;
 import com.example.paymentsystem.application.service.query.PaymentQueryService;
 import com.example.paymentsystem.application.service.wallet.WalletService;
@@ -22,13 +23,19 @@ import com.example.paymentsystem.domain.entity.cancel.CancelStatus;
 import com.example.paymentsystem.domain.entity.cancel.CancelType;
 import com.example.paymentsystem.domain.entity.payment.PaymentStatus;
 import com.example.paymentsystem.presentation.payment.PaymentController;
+import com.example.paymentsystem.presentation.audit.AuditValueSanitizer;
 import com.example.paymentsystem.presentation.query.CustomerPaymentQueryController;
 import com.example.paymentsystem.presentation.query.OperationsPaymentQueryController;
 import com.example.paymentsystem.presentation.wallet.WalletController;
 import java.util.List;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
 /** 프레젠테이션 엔드포인트의 바인딩, 상태 코드 및 공통 응답 계약을 검증한다. */
 @WebMvcTest({WalletController.class, PaymentController.class, CustomerPaymentQueryController.class,
         OperationsPaymentQueryController.class})
+@Import(PresentationControllerTest.MeterConfiguration.class)
 class PresentationControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -47,6 +55,10 @@ class PresentationControllerTest {
     private PaymentCancelFacade paymentCancelFacade;
     @MockitoBean
     private PaymentQueryService paymentQueryService;
+    @MockitoBean
+    private AuditLogService auditLogService;
+    @MockitoBean
+    private AuditValueSanitizer auditValueSanitizer;
 
     /** 지갑 생성·조회·충전 API가 서비스 결과를 표준 응답으로 반환하는지 검증한다. */
     @Test
@@ -121,5 +133,15 @@ class PresentationControllerTest {
     private static PaymentResult payment() {
         return PaymentResult.builder().paymentId(10L).idempotencyKey("payment-1").customerId("customer-1")
                 .amount(1000).status(PaymentStatus.COMPLETED).remainingCancelableAmount(1000).build();
+    }
+
+    /** Web MVC Slice에서 감사 실패 지표 등록에 필요한 메트릭 저장소를 제공한다. */
+    @TestConfiguration
+    static class MeterConfiguration {
+        /** 테스트 범위의 인메모리 MeterRegistry를 생성한다. */
+        @Bean
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
     }
 }

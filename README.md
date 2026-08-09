@@ -51,6 +51,22 @@ macOS/Linux:
 
 H2는 인메모리 모드로 사용하므로 애플리케이션을 재시작하면 데이터가 초기화됩니다.
 
+### Docker Compose로 동일 환경 실행
+
+Docker Engine과 Docker Compose v2가 설치된 PC에서는 다음 명령으로 Java 17, 애플리케이션 설정 및 파일 기반 H2 환경을 동일하게 실행할 수 있습니다.
+
+```bash
+docker compose up --build -d
+docker compose logs -f payment-system
+```
+
+- API: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- 상태 확인: `http://localhost:8080/actuator/health`
+- 데이터는 `payment-data` named volume에 유지됩니다.
+
+컨테이너를 중지하려면 `docker compose down`을 사용합니다. 데이터까지 초기화하는 `docker compose down -v`는 저장된 개발 데이터를 삭제하므로 명시적으로 초기화할 때만 사용합니다. Compose에 포함된 암호화 키는 로컬 재현 전용이며 운영 환경에서는 secret manager로 교체해야 합니다.
+
 ## 문서
 
 - [요구사항 정의서](docs/project/requirements-definition.md): 제품 범위, 기능·비기능 요구사항, 인수 기준 및 확정 정책
