@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:/data/paymentdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=FALSE
+    url: jdbc:h2:file:/data/paymentdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
     username: sa
     password:
   h2:

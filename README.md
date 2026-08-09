@@ -82,3 +82,12 @@ docker compose logs -f payment-system
 - 외부 알림, 관리자 화면 및 대시보드 UI
 
 제외된 기능성 요구사항은 2페이즈부터 검토합니다.
+
+## Outbox Worker 독립 실행
+
+`docker compose up --build -d`는 API와 Outbox Worker를 별도 컨테이너로 실행합니다.
+
+- Worker health: `http://localhost:8081/actuator/health`
+- Worker metrics: `http://localhost:8081/actuator/metrics`
+
+운영 환경에서는 두 프로세스가 같은 공유 RDBMS를 사용하도록 datasource URL과 자격 증명을 동일하게 설정해야 합니다. 파일 기반 H2는 로컬 개발 확인 용도입니다.
