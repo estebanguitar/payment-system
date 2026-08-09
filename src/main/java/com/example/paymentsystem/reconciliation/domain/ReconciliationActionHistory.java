@@ -2,6 +2,8 @@ package com.example.paymentsystem.reconciliation.domain;
 
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.ActionType;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.CaseStatus;
+import com.example.paymentsystem.shared.domain.exception.DomainErrorCode;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,7 +65,7 @@ public class ReconciliationActionHistory {
       String reference,
       LocalDateTime now) {
     if (operator == null || operator.isBlank() || reason == null || reason.isBlank())
-      throw new IllegalArgumentException("운영자와 사유는 필수입니다.");
+      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "운영자와 사유는 필수입니다.");
     ReconciliationActionHistory h = new ReconciliationActionHistory();
     h.caseId = caseId;
     h.actionType = type;

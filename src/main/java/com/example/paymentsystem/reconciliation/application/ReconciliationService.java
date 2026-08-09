@@ -42,7 +42,7 @@ public class ReconciliationService implements ReconciliationExecutionPort {
     for (ReconciliationDetector detector : detectors) {
       try {
         List<ReconciliationFinding> findings = detector.detect(from, to);
-        checked += findings.size();
+        checked++;
         mismatch += findings.size();
         for (ReconciliationFinding finding : findings) {
           ReconciliationCase item =

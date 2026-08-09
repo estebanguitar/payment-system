@@ -8,10 +8,12 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationRun;
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationActionHistoryRepository;
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationCaseRepository;
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationRunRepository;
+import com.example.paymentsystem.shared.application.dto.PageResult;
+import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
+import com.example.paymentsystem.shared.application.exception.ApplicationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,25 +29,30 @@ public class ReconciliationOperationsService {
   private final List<ReconciliationDetector> detectors;
 
   /** 실행 이력을 최신순 조회한다. */
-  public Page<ReconciliationRun> runs(int page, int size) {
-    return runs.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startedAt")));
+  public PageResult<ReconciliationRun> runs(int page, int size) {
+    validatePage(page, size);
+    return PageResult.from(
+        runs.findAll(PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "startedAt"))));
   }
 
   /** 실행 단건을 조회한다. */
   public ReconciliationRun run(Long id) {
-    return runs.findById(id).orElseThrow(() -> new IllegalArgumentException("대사 실행을 찾을 수 없습니다."));
+    return runs.findById(id)
+        .orElseThrow(
+            () -> new ApplicationException(ApplicationErrorCode.RECONCILIATION_RUN_NOT_FOUND, id));
   }
 
   /** Case를 최신 탐지순 조회한다. */
-  public Page<ReconciliationCase> cases(int page, int size) {
-    return cases.findAll(
-        PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lastDetectedAt")));
+  public PageResult<ReconciliationCase> cases(int page, int size) {
+    validatePage(page, size);
+    return PageResult.from(
+        cases.findAll(
+            PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "lastDetectedAt"))));
   }
 
   /** Case와 조치 이력을 조회한다. */
   public CaseDetail detail(Long id) {
-    ReconciliationCase c =
-        cases.findById(id).orElseThrow(() -> new IllegalArgumentException("대사 Case를 찾을 수 없습니다."));
+    ReconciliationCase c = findCase(id);
     return new CaseDetail(c, histories.findByCaseIdOrderByCreatedAtAsc(id));
   }
 
@@ -53,7 +60,7 @@ public class ReconciliationOperationsService {
   @Transactional
   public ReconciliationCase action(
       Long id, ActionType action, String operator, String reason, String ref) {
-    ReconciliationCase c = cases.findById(id).orElseThrow();
+    ReconciliationCase c = findCase(id);
     CaseStatus from = c.apply(action);
     histories.save(
         ReconciliationActionHistory.create(
@@ -64,7 +71,7 @@ public class ReconciliationOperationsService {
   /** 동일 유형·대상의 불일치가 사라진 경우에만 Case를 해결 처리한다. */
   @Transactional
   public ReconciliationCase recheck(Long id, String operator, String reason) {
-    ReconciliationCase c = cases.findById(id).orElseThrow();
+    ReconciliationCase c = findCase(id);
     LocalDateTime from = c.getFirstDetectedAt().minusMinutes(1);
     LocalDateTime to = LocalDateTime.now().plusMinutes(1);
     boolean remains =
@@ -93,4 +100,17 @@ public class ReconciliationOperationsService {
   /** Case와 변경 불가능한 조치 이력을 함께 반환한다. */
   public record CaseDetail(
       ReconciliationCase reconciliationCase, List<ReconciliationActionHistory> actions) {}
+
+  private ReconciliationCase findCase(Long id) {
+    return cases
+        .findById(id)
+        .orElseThrow(
+            () -> new ApplicationException(ApplicationErrorCode.RECONCILIATION_CASE_NOT_FOUND, id));
+  }
+
+  private static void validatePage(int page, int size) {
+    if (page < 1 || size < 1 || size > 100) {
+      throw new ApplicationException(ApplicationErrorCode.INVALID_PAGE_REQUEST);
+    }
+  }
 }

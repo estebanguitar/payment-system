@@ -6,6 +6,7 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Misma
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.RunStatus;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Severity;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.TriggerType;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class ReconciliationDomainTest {
             "{}");
     ReconciliationCase c = ReconciliationCase.open(f, 1L, now);
     Assertions.assertThatThrownBy(() -> c.apply(ActionType.CONFIRM_RESOLVED))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(DomainException.class);
   }
 
   @Test

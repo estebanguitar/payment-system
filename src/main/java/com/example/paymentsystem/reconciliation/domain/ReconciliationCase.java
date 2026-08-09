@@ -4,6 +4,8 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Actio
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.CaseStatus;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.MismatchType;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Severity;
+import com.example.paymentsystem.shared.domain.exception.DomainErrorCode;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -124,7 +126,9 @@ public class ReconciliationCase {
           case REQUEST_PG_CONFIRMATION, REQUEST_MANUAL_LEDGER_REVIEW, RECHECK ->
               CaseStatus.ACTION_REQUIRED;
           case MARK_FALSE_POSITIVE -> CaseStatus.FALSE_POSITIVE;
-          case CONFIRM_RESOLVED -> throw new IllegalArgumentException("해결은 재검증으로만 확정할 수 있습니다.");
+          case CONFIRM_RESOLVED ->
+              throw new DomainException(
+                  DomainErrorCode.INVALID_REQUIRED_VALUE, "해결은 재검증으로만 확정할 수 있습니다.");
         };
     return before;
   }

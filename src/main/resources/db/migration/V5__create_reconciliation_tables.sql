@@ -6,7 +6,7 @@ CREATE TABLE reconciliation_run (
     range_end TIMESTAMP NOT NULL COMMENT '검사 범위 종료 일시',
     started_at TIMESTAMP NOT NULL COMMENT '실행 시작 일시',
     completed_at TIMESTAMP COMMENT '실행 완료 일시',
-    checked_count BIGINT NOT NULL DEFAULT 0 COMMENT '검사한 레코드 수',
+    checked_count BIGINT NOT NULL DEFAULT 0 COMMENT '정상 완료한 검사기 수',
     mismatch_count BIGINT NOT NULL DEFAULT 0 COMMENT '발견한 불일치 수',
     failed_count BIGINT NOT NULL DEFAULT 0 COMMENT '실패한 검사기 수',
     trigger_type VARCHAR(32) NOT NULL COMMENT '실행 요청 유형',

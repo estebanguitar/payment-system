@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /** 대사 실행의 DB 멱등성과 Detector 부분 실패 격리를 통합 검증한다. */
 @SpringBootTest
@@ -19,7 +19,7 @@ class ReconciliationIntegrationTest {
   @Autowired ReconciliationExecutionPort service;
   @Autowired ReconciliationRunRepository runs;
 
-  @MockBean(name = "ledgerConsistencyDetector")
+  @MockitoBean(name = "ledgerConsistencyDetector")
   ReconciliationDetector detector;
 
   @Test

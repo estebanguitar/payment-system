@@ -1,5 +1,6 @@
 package com.example.paymentsystem.reconciliation.presentation;
 
+import com.example.paymentsystem.payment.presentation.query.dto.PageResponse;
 import com.example.paymentsystem.reconciliation.application.ReconciliationExecutionPort;
 import com.example.paymentsystem.reconciliation.application.ReconciliationOperationsService;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationRun;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,10 +45,10 @@ public class ReconciliationController {
 
   @Operation(summary = "대사 실행 목록")
   @GetMapping("/reconciliations/runs")
-  public ResponseEntity<ApiResponse<Page<RunResponse>>> runs(
-      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+  public ResponseEntity<ApiResponse<PageResponse<RunResponse>>> runs(
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
     return ResponseEntity.ok(
-        ApiResponse.success(operations.runs(page, size).map(RunResponse::from)));
+        ApiResponse.success(PageResponse.from(operations.runs(page, size), RunResponse::from)));
   }
 
   @Operation(summary = "대사 실행 상세")
@@ -59,10 +59,10 @@ public class ReconciliationController {
 
   @Operation(summary = "대사 Case 목록")
   @GetMapping("/reconciliation-cases")
-  public ResponseEntity<ApiResponse<Page<CaseResponse>>> cases(
-      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+  public ResponseEntity<ApiResponse<PageResponse<CaseResponse>>> cases(
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
     return ResponseEntity.ok(
-        ApiResponse.success(operations.cases(page, size).map(CaseResponse::from)));
+        ApiResponse.success(PageResponse.from(operations.cases(page, size), CaseResponse::from)));
   }
 
   @Operation(summary = "대사 Case 상세")

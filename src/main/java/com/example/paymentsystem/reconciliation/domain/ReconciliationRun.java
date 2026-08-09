@@ -2,6 +2,8 @@ package com.example.paymentsystem.reconciliation.domain;
 
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.RunStatus;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.TriggerType;
+import com.example.paymentsystem.shared.domain.exception.DomainErrorCode;
+import com.example.paymentsystem.shared.domain.exception.DomainException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -74,7 +76,8 @@ public class ReconciliationRun {
         || to == null
         || !from.isBefore(to)
         || trigger == null
-        || now == null) throw new IllegalArgumentException("유효한 대사 실행 정보가 필요합니다.");
+        || now == null)
+      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "유효한 대사 실행 정보가 필요합니다.");
     ReconciliationRun run = new ReconciliationRun();
     run.runKey = key;
     run.rangeStart = from;
