@@ -66,3 +66,11 @@ info:
     version: "0.0.1-SNAPSHOT"
     encoding: "UTF-8"
     java-version: "17"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
