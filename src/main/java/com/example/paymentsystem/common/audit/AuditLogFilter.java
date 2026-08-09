@@ -1,5 +1,6 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
+import com.example.paymentsystem.common.web.TraceIdFilter;
 import com.example.paymentsystem.service.audit.AuditLogService;
 import com.example.paymentsystem.dto.audit.AuditLogCommand;
 import com.example.paymentsystem.dto.audit.AuditPayload;
@@ -21,7 +22,6 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -31,7 +31,6 @@ import org.springframework.web.servlet.HandlerMapping;
 /** API 요청·응답을 제한된 크기로 수집하고 민감 원문을 암호화해 감사 이력으로 저장한다. */
 @Slf4j
 @Component
-@ConditionalOnBean(PayloadEncryptor.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class AuditLogFilter extends OncePerRequestFilter {
     private static final int MAX_BODY_CHARS = 4096;

@@ -1,13 +1,13 @@
 package com.example.paymentsystem.integration.pg;
 
-import com.example.paymentsystem.integration.pg.pg.PgApprovalCommand;
-import com.example.paymentsystem.integration.pg.pg.PgApprovalResult;
-import com.example.paymentsystem.integration.pg.pg.PgCancelCommand;
-import com.example.paymentsystem.integration.pg.pg.PgCancelResult;
-import com.example.paymentsystem.integration.pg.pg.PgClient;
-import com.example.paymentsystem.integration.pg.pg.PgClientException;
-import com.example.paymentsystem.integration.pg.pg.PgErrorType;
-import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
+import com.example.paymentsystem.integration.pg.PgApprovalCommand;
+import com.example.paymentsystem.integration.pg.PgApprovalResult;
+import com.example.paymentsystem.integration.pg.PgCancelCommand;
+import com.example.paymentsystem.integration.pg.PgCancelResult;
+import com.example.paymentsystem.integration.pg.PgClient;
+import com.example.paymentsystem.integration.pg.PgClientException;
+import com.example.paymentsystem.integration.pg.PgErrorType;
+import com.example.paymentsystem.integration.pg.PgResultStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;

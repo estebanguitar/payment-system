@@ -1,4 +1,4 @@
-package com.example.paymentsystem.integration.pg.pg;
+package com.example.paymentsystem.integration.pg;
 
 import lombok.Getter;
 

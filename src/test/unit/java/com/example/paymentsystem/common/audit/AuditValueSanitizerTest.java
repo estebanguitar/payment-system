@@ -1,4 +1,4 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

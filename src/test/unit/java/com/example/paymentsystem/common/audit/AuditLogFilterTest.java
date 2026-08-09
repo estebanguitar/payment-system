@@ -1,8 +1,9 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
+import com.example.paymentsystem.common.web.TraceIdFilter;
 import com.example.paymentsystem.service.audit.AuditLogService;
 import com.example.paymentsystem.dto.audit.AuditLogCommand;
-import com.example.paymentsystem.integration.pg.AesGcmPayloadEncryptor;
+import com.example.paymentsystem.integration.pg.security.AesGcmPayloadEncryptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import jakarta.servlet.FilterChain;

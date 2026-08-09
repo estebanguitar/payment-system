@@ -1,6 +1,5 @@
-package com.example.paymentsystem.integration.pg;
+package com.example.paymentsystem.integration.pg.security;
 
-import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;

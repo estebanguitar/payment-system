@@ -1,4 +1,4 @@
-package com.example.paymentsystem.integration.pg;
+package com.example.paymentsystem.integration.pg.security;
 
 /** 키·평문·암호문을 노출하지 않고 암복호화 실패를 전달한다. */
 public class EncryptionException extends RuntimeException {

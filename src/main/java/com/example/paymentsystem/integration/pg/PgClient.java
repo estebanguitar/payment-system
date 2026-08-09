@@ -1,4 +1,4 @@
-package com.example.paymentsystem.integration.pg.pg;
+package com.example.paymentsystem.integration.pg;
 
 /** 결제 승인과 취소를 외부 PG 구현으로 교체할 수 있게 분리한 출력 포트다. */
 public interface PgClient {

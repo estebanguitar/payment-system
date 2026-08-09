@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.integration.pg.pg.PgCancelResult;
-import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
+import com.example.paymentsystem.integration.pg.PgCancelResult;
+import com.example.paymentsystem.integration.pg.PgResultStatus;
 import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import com.example.paymentsystem.domain.payment.CancelType;
 import com.example.paymentsystem.domain.payment.PaymentCancel;

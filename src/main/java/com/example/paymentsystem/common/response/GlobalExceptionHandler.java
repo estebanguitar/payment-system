@@ -1,6 +1,6 @@
 package com.example.paymentsystem.common.response;
 
-import com.example.paymentsystem.controller.audit.AuditRequestContext;
+import com.example.paymentsystem.common.audit.AuditRequestContext;
 import com.example.paymentsystem.common.exception.ApplicationErrorCode;
 import com.example.paymentsystem.common.exception.ApplicationException;
 import com.example.paymentsystem.common.exception.DomainErrorCode;

@@ -23,7 +23,8 @@ import com.example.paymentsystem.domain.payment.CancelStatus;
 import com.example.paymentsystem.domain.payment.CancelType;
 import com.example.paymentsystem.domain.payment.PaymentStatus;
 import com.example.paymentsystem.controller.payment.PaymentController;
-import com.example.paymentsystem.controller.audit.AuditValueSanitizer;
+import com.example.paymentsystem.common.audit.AuditValueSanitizer;
+import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import com.example.paymentsystem.controller.payment.CustomerPaymentQueryController;
 import com.example.paymentsystem.controller.payment.OperationsPaymentQueryController;
 import com.example.paymentsystem.controller.wallet.WalletController;
@@ -59,6 +60,8 @@ class PresentationControllerTest {
     private AuditLogService auditLogService;
     @MockitoBean
     private AuditValueSanitizer auditValueSanitizer;
+    @MockitoBean
+    private PayloadEncryptor payloadEncryptor;
 
     /** 지갑 생성·조회·충전 API가 서비스 결과를 표준 응답으로 반환하는지 검증한다. */
     @Test

@@ -1,4 +1,4 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;

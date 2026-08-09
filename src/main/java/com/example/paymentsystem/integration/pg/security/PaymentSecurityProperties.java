@@ -1,4 +1,4 @@
-package com.example.paymentsystem.integration.pg;
+package com.example.paymentsystem.integration.pg.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

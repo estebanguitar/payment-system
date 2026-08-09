@@ -1,6 +1,5 @@
-package com.example.paymentsystem.integration.pg;
+package com.example.paymentsystem.integration.pg.security;
 
-import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

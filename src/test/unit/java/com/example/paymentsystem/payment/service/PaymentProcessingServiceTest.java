@@ -5,8 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.integration.pg.pg.PgApprovalResult;
-import com.example.paymentsystem.integration.pg.pg.PgResultStatus;
+import com.example.paymentsystem.integration.pg.PgApprovalResult;
+import com.example.paymentsystem.integration.pg.PgResultStatus;
 import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import com.example.paymentsystem.common.exception.InsufficientBalanceException;
 import com.example.paymentsystem.domain.outbox.OutboxStatus;

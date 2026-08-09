@@ -1,4 +1,4 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
@@ -7,16 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuditValueSanitizer {
     private static final Pattern CLIENT_ID = Pattern.compile("[A-Za-z0-9._-]{1,100}");
-    private static final Pattern TRACE_ID = Pattern.compile("[A-Za-z0-9._-]{1,64}");
 
     /** 유효한 clientId만 유지하고 나머지는 anonymous로 대체한다. */
     public String clientId(String value) {
         return value != null && CLIENT_ID.matcher(value).matches() ? value : "anonymous";
-    }
-
-    /** 유효한 traceId만 유지하며 잘못된 값은 null로 반환한다. */
-    public String traceId(String value) {
-        return value != null && TRACE_ID.matcher(value).matches() ? value : null;
     }
 
     /** 매핑된 URI 템플릿만 저장하고 미매핑 경로의 실제 값은 숨긴다. */

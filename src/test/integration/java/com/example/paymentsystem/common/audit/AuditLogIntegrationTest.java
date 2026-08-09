@@ -1,4 +1,4 @@
-package com.example.paymentsystem.controller.audit;
+package com.example.paymentsystem.common.audit;
 
 import com.example.paymentsystem.domain.audit.AuditLog;
 import com.example.paymentsystem.repository.audit.AuditLogRepository;

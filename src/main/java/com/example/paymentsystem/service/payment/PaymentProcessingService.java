@@ -2,7 +2,7 @@ package com.example.paymentsystem.service.payment;
 
 import com.example.paymentsystem.common.exception.ApplicationErrorCode;
 import com.example.paymentsystem.common.exception.ApplicationException;
-import com.example.paymentsystem.integration.pg.pg.PgApprovalResult;
+import com.example.paymentsystem.integration.pg.PgApprovalResult;
 import com.example.paymentsystem.integration.pg.security.PayloadEncryptor;
 import com.example.paymentsystem.common.exception.InsufficientBalanceException;
 import com.example.paymentsystem.domain.outbox.PaymentOutbox;
