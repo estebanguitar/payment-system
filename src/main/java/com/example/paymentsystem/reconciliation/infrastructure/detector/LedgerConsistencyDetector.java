@@ -6,6 +6,7 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Sever
 import com.example.paymentsystem.reconciliation.domain.ReconciliationFinding;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,12 +16,25 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LedgerConsistencyDetector implements ReconciliationDetector {
+  private static final EnumSet<MismatchType> SUPPORTED_TYPES =
+      EnumSet.of(
+          MismatchType.WALLET_BALANCE_MISMATCH,
+          MismatchType.PAYMENT_DEBIT_AMOUNT_MISMATCH,
+          MismatchType.CANCEL_ACCUMULATION_MISMATCH,
+          MismatchType.PG_RESPONSE_LOG_MISSING);
+
   private final JdbcTemplate jdbc;
 
   /** 검사기 식별자를 반환한다. */
   @Override
   public String name() {
     return "ledger-consistency";
+  }
+
+  /** 원장 SQL 검사기가 담당하는 불일치 유형인지 확인한다. */
+  @Override
+  public boolean supports(MismatchType mismatchType) {
+    return SUPPORTED_TYPES.contains(mismatchType);
   }
 
   /** 시간 범위의 핵심 원장 불일치를 읽기 전용 쿼리로 탐지한다. */
@@ -31,13 +45,15 @@ public class LedgerConsistencyDetector implements ReconciliationDetector {
         result,
         "SELECT w.id,w.customer_id,w.balance,COALESCE(SUM(CASE WHEN wt.transaction_type IN"
             + " ('TOP_UP','REFUND') THEN wt.amount ELSE -wt.amount END),0) expected FROM wallet w"
-            + " LEFT JOIN wallet_transaction wt ON wt.wallet_id=w.id GROUP BY"
+            + " LEFT JOIN wallet_transaction wt ON wt.wallet_id=w.id WHERE EXISTS (SELECT 1 FROM"
+            + " wallet_transaction changed WHERE changed.wallet_id=w.id AND changed.created_at>=?"
+            + " AND changed.created_at<?) GROUP BY"
             + " w.id,w.customer_id,w.balance HAVING w.balance<>COALESCE(SUM(CASE WHEN"
             + " wt.transaction_type IN ('TOP_UP','REFUND') THEN wt.amount ELSE -wt.amount END),0)",
         MismatchType.WALLET_BALANCE_MISMATCH,
         Severity.CRITICAL,
         "wallet",
-        null);
+        new Object[] {from, to});
     query(
         result,
         "SELECT p.id,p.customer_id,p.amount,COALESCE(SUM(wt.amount),0) expected FROM payment p LEFT"

@@ -87,6 +87,7 @@ public class ReconciliationCase {
 
   /** 새 불일치 Case를 OPEN 상태로 생성한다. */
   public static ReconciliationCase open(ReconciliationFinding f, Long runId, LocalDateTime now) {
+    validateDetection(f, runId, now);
     ReconciliationCase c = new ReconciliationCase();
     c.caseKey = f.caseKey();
     c.latestRunId = runId;
@@ -108,7 +109,16 @@ public class ReconciliationCase {
 
   /** 재탐지 근거와 실행을 갱신하되 운영 판정을 임의로 되돌리지 않는다. */
   public void redetect(ReconciliationFinding f, Long runId, LocalDateTime now) {
+    validateDetection(f, runId, now);
+    caseKey = f.caseKey();
     latestRunId = runId;
+    mismatchType = f.type();
+    severity = f.severity();
+    customerId = f.customerId();
+    walletId = f.walletId();
+    paymentId = f.paymentId();
+    cancelId = f.cancelId();
+    outboxId = f.outboxId();
     expectedValue = f.expectedValue();
     actualValue = f.actualValue();
     evidence = f.evidence();
@@ -135,7 +145,26 @@ public class ReconciliationCase {
 
   /** 동일 검사기의 정상 재검증 결과로만 해결 처리한다. */
   public void resolve(LocalDateTime now) {
+    if (now == null) {
+      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "해결 시각은 필수입니다.");
+    }
     status = CaseStatus.RESOLVED;
     resolvedAt = now;
+  }
+
+  private static void validateDetection(
+      ReconciliationFinding finding, Long runId, LocalDateTime now) {
+    if (finding == null
+        || finding.caseKey() == null
+        || finding.caseKey().isBlank()
+        || finding.type() == null
+        || finding.severity() == null
+        || finding.evidence() == null
+        || finding.evidence().isBlank()
+        || runId == null
+        || runId <= 0
+        || now == null) {
+      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "유효한 대사 탐지 정보가 필요합니다.");
+    }
   }
 }

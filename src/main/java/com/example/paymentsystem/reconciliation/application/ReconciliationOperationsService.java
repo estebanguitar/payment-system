@@ -11,9 +11,11 @@ import com.example.paymentsystem.reconciliation.infrastructure.repository.Reconc
 import com.example.paymentsystem.shared.application.dto.PageResult;
 import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.shared.application.exception.ApplicationException;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 /** 대사 실행·Case 조회와 수동 판정 이력을 제공한다. */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReconciliationOperationsService {
   private final ReconciliationRunRepository runs;
   private final ReconciliationCaseRepository cases;
   private final ReconciliationActionHistoryRepository histories;
   private final List<ReconciliationDetector> detectors;
+  private final Clock clock;
 
   /** 실행 이력을 최신순 조회한다. */
   public PageResult<ReconciliationRun> runs(int page, int size) {
@@ -72,28 +76,35 @@ public class ReconciliationOperationsService {
   @Transactional
   public ReconciliationCase recheck(Long id, String operator, String reason) {
     ReconciliationCase c = findCase(id);
+    LocalDateTime now = LocalDateTime.now(clock);
     LocalDateTime from = c.getFirstDetectedAt().minusMinutes(1);
-    LocalDateTime to = LocalDateTime.now().plusMinutes(1);
-    boolean remains =
-        detectors.stream()
-            .flatMap(d -> d.detect(from, to).stream())
-            .anyMatch(f -> f.caseKey().equals(c.getCaseKey()));
+    LocalDateTime to = now.plusMinutes(1);
+    boolean remains = false;
+    boolean verificationFailed = false;
+    boolean attempted = false;
+    for (ReconciliationDetector detector : detectors) {
+      if (!detector.supports(c.getMismatchType())) {
+        continue;
+      }
+      attempted = true;
+      try {
+        remains |=
+            detector.detect(from, to).stream()
+                .anyMatch(finding -> finding.caseKey().equals(c.getCaseKey()));
+      } catch (RuntimeException exception) {
+        verificationFailed = true;
+        log.warn("대사 Case 재검증에 실패했습니다. caseId={}, detector={}", id, detector.name(), exception);
+      }
+    }
     CaseStatus before = c.getStatus();
-    if (remains) {
+    if (!attempted || verificationFailed || remains) {
       c.apply(ActionType.RECHECK);
     } else {
-      c.resolve(LocalDateTime.now());
+      c.resolve(now);
     }
     histories.save(
         ReconciliationActionHistory.create(
-            id,
-            ActionType.RECHECK,
-            before,
-            c.getStatus(),
-            operator,
-            reason,
-            null,
-            LocalDateTime.now()));
+            id, ActionType.RECHECK, before, c.getStatus(), operator, reason, null, now));
     return c;
   }
 

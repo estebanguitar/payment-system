@@ -1,5 +1,6 @@
 package com.example.paymentsystem.reconciliation.application;
 
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.MismatchType;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationFinding;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,6 +9,9 @@ import java.util.List;
 public interface ReconciliationDetector {
   /** 운영 지표에서 검사기를 구분할 수 있는 고유 이름을 반환한다. */
   String name();
+
+  /** 검사기가 지정한 불일치 유형을 재검증할 수 있는지 반환한다. */
+  boolean supports(MismatchType mismatchType);
 
   /** 지정한 시간 범위를 조회하되 원장을 변경하지 않고 불일치 목록만 반환한다. */
   List<ReconciliationFinding> detect(LocalDateTime from, LocalDateTime to);

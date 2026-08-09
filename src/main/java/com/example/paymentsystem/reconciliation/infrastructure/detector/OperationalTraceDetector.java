@@ -6,6 +6,7 @@ import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.Sever
 import com.example.paymentsystem.reconciliation.domain.ReconciliationFinding;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,12 +16,25 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class OperationalTraceDetector implements ReconciliationDetector {
+  private static final EnumSet<MismatchType> SUPPORTED_TYPES =
+      EnumSet.of(
+          MismatchType.PAYMENT_STUCK_PENDING,
+          MismatchType.CANCEL_STUCK_PENDING,
+          MismatchType.OUTBOX_STUCK_INIT,
+          MismatchType.CANCEL_REFUND_AMOUNT_MISMATCH);
+
   private final JdbcTemplate jdbc;
 
   /** 검사기 식별자를 반환한다. */
   @Override
   public String name() {
     return "operational-trace";
+  }
+
+  /** 운영 흔적 검사기가 담당하는 불일치 유형인지 확인한다. */
+  @Override
+  public boolean supports(MismatchType mismatchType) {
+    return SUPPORTED_TYPES.contains(mismatchType);
   }
 
   /** 범위 종료 10분 전까지 완료되지 않은 처리와 환불 누락을 찾는다. */

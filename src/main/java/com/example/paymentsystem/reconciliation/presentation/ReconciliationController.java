@@ -3,6 +3,7 @@ package com.example.paymentsystem.reconciliation.presentation;
 import com.example.paymentsystem.payment.presentation.query.dto.PageResponse;
 import com.example.paymentsystem.reconciliation.application.ReconciliationExecutionPort;
 import com.example.paymentsystem.reconciliation.application.ReconciliationOperationsService;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.TriggerType;
 import com.example.paymentsystem.reconciliation.domain.ReconciliationRun;
 import com.example.paymentsystem.reconciliation.presentation.dto.ReconciliationDtos.ActionRequest;
 import com.example.paymentsystem.reconciliation.presentation.dto.ReconciliationDtos.ActionResponse;
@@ -39,7 +40,8 @@ public class ReconciliationController {
   @PostMapping("/reconciliations/runs")
   public ResponseEntity<ApiResponse<RunResponse>> run(@Valid @RequestBody RunRequest request) {
     ReconciliationRun run =
-        executor.execute(request.rangeStart(), request.rangeEnd(), request.requestedBy());
+        executor.execute(
+            request.rangeStart(), request.rangeEnd(), TriggerType.MANUAL, request.requestedBy());
     return ResponseEntity.ok(ApiResponse.success(RunResponse.from(run)));
   }
 

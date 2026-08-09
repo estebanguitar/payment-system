@@ -16,7 +16,9 @@ import com.example.paymentsystem.reconciliation.infrastructure.repository.Reconc
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationRunRepository;
 import com.example.paymentsystem.shared.application.exception.ApplicationErrorCode;
 import com.example.paymentsystem.shared.application.exception.ApplicationException;
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +41,13 @@ class ReconciliationOperationsServiceTest {
 
   @BeforeEach
   void setUp() {
-    service = new ReconciliationOperationsService(runs, cases, histories, List.of(detector));
+    service =
+        new ReconciliationOperationsService(
+            runs,
+            cases,
+            histories,
+            List.of(detector),
+            Clock.fixed(NOW.toInstant(ZoneOffset.UTC), ZoneOffset.UTC));
   }
 
   /** 불일치가 남아 있으면 해결하지 않고 추가 조치 필요 상태로 전환한다. */
@@ -48,6 +56,7 @@ class ReconciliationOperationsServiceTest {
     ReconciliationFinding finding = finding("case-1");
     ReconciliationCase reconciliationCase = ReconciliationCase.open(finding, 1L, NOW);
     when(cases.findById(1L)).thenReturn(Optional.of(reconciliationCase));
+    when(detector.supports(MismatchType.PAYMENT_DEBIT_MISSING)).thenReturn(true);
     when(detector.detect(any(), any())).thenReturn(List.of(finding));
 
     ReconciliationCase result = service.recheck(1L, "operator", "다시 확인");
@@ -61,12 +70,29 @@ class ReconciliationOperationsServiceTest {
   void recheckResolvesCaseWhenMismatchDisappears() {
     ReconciliationCase reconciliationCase = ReconciliationCase.open(finding("case-1"), 1L, NOW);
     when(cases.findById(1L)).thenReturn(Optional.of(reconciliationCase));
+    when(detector.supports(MismatchType.PAYMENT_DEBIT_MISSING)).thenReturn(true);
     when(detector.detect(any(), any())).thenReturn(List.of());
 
     ReconciliationCase result = service.recheck(1L, "operator", "정상화 확인");
 
     assertThat(result.getStatus()).isEqualTo(CaseStatus.RESOLVED);
     assertThat(result.getResolvedAt()).isNotNull();
+    verify(histories).save(any());
+  }
+
+  /** 검사기가 실패하면 불일치 해소로 오판하지 않고 추가 조치 필요 상태를 유지한다. */
+  @Test
+  void recheckKeepsCaseActionRequiredWhenDetectorFails() {
+    ReconciliationCase reconciliationCase = ReconciliationCase.open(finding("case-1"), 1L, NOW);
+    when(cases.findById(1L)).thenReturn(Optional.of(reconciliationCase));
+    when(detector.name()).thenReturn("failing-detector");
+    when(detector.supports(MismatchType.PAYMENT_DEBIT_MISSING)).thenReturn(true);
+    when(detector.detect(any(), any())).thenThrow(new IllegalStateException("failure"));
+
+    ReconciliationCase result = service.recheck(1L, "operator", "재검증 실패");
+
+    assertThat(result.getStatus()).isEqualTo(CaseStatus.ACTION_REQUIRED);
+    assertThat(result.getResolvedAt()).isNull();
     verify(histories).save(any());
   }
 

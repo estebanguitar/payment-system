@@ -2,6 +2,7 @@ package com.example.paymentsystem.reconciliation;
 
 import com.example.paymentsystem.reconciliation.application.ReconciliationDetector;
 import com.example.paymentsystem.reconciliation.application.ReconciliationExecutionPort;
+import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.TriggerType;
 import com.example.paymentsystem.reconciliation.infrastructure.repository.ReconciliationRunRepository;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
@@ -27,8 +28,8 @@ class ReconciliationIntegrationTest {
     LocalDateTime from = LocalDateTime.of(2026, 8, 1, 0, 0), to = from.plusDays(1);
     Mockito.when(detector.name()).thenReturn("broken");
     Mockito.when(detector.detect(from, to)).thenThrow(new IllegalStateException("failure"));
-    var first = service.execute(from, to, "ops");
-    var second = service.execute(from, to, "other");
+    var first = service.execute(from, to, TriggerType.MANUAL, "ops");
+    var second = service.execute(from, to, TriggerType.MANUAL, "other");
     Assertions.assertThat(second.getId()).isEqualTo(first.getId());
     Assertions.assertThat(first.getStatus().name()).isEqualTo("PARTIALLY_FAILED");
     Assertions.assertThat(runs.count()).isEqualTo(1);

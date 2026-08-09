@@ -64,8 +64,17 @@ public class ReconciliationActionHistory {
       String reason,
       String reference,
       LocalDateTime now) {
-    if (operator == null || operator.isBlank() || reason == null || reason.isBlank())
-      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "운영자와 사유는 필수입니다.");
+    if (caseId == null
+        || caseId <= 0
+        || type == null
+        || from == null
+        || to == null
+        || operator == null
+        || operator.isBlank()
+        || reason == null
+        || reason.isBlank()
+        || now == null)
+      throw new DomainException(DomainErrorCode.INVALID_REQUIRED_VALUE, "유효한 대사 조치 이력 정보가 필요합니다.");
     ReconciliationActionHistory h = new ReconciliationActionHistory();
     h.caseId = caseId;
     h.actionType = type;
