@@ -7,7 +7,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/** 도메인 우선 패키지와 핵심 계층 의존 규칙의 회귀를 차단한다. */
+/** 간결한 레이어드 패키지의 핵심 의존 규칙을 보호한다. */
 class PackageArchitectureTest {
     private static JavaClasses classes;
 
@@ -17,14 +17,19 @@ class PackageArchitectureTest {
         classes = new ClassFileImporter().importPackages("com.example.paymentsystem");
     }
 
-    /** 구 역할 우선 최상위 패키지에 운영 코드가 다시 생성되지 않는지 검증한다. */
+    /** 과거 도메인별 중첩 최상위 패키지가 다시 생성되지 않는지 검증한다. */
     @Test
     void legacyLayerFirstPackagesMustRemainEmpty() {
         ArchRule rule = ArchRuleDefinition.noClasses().should().resideInAnyPackage(
-                "com.example.paymentsystem.application..",
-                "com.example.paymentsystem.domain..",
-                "com.example.paymentsystem.infrastructure..",
-                "com.example.paymentsystem.presentation..");
+                "com.example.paymentsystem.customer..",
+                "com.example.paymentsystem.wallet..",
+                "com.example.paymentsystem.payment..",
+                "com.example.paymentsystem.cancellation..",
+                "com.example.paymentsystem.outbox..",
+                "com.example.paymentsystem.audit..",
+                "com.example.paymentsystem.idempotency..",
+                "com.example.paymentsystem.pg..",
+                "com.example.paymentsystem.shared..");
         rule.check(classes);
     }
 
@@ -33,7 +38,7 @@ class PackageArchitectureTest {
     void domainMustNotDependOnUpperLayers() {
         ArchRule rule = ArchRuleDefinition.noClasses().that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat().resideInAnyPackage(
-                        "..application..", "..infrastructure..", "..presentation..");
+                        "..service..", "..repository..", "..controller..", "..integration..", "..scheduler..");
         rule.check(classes);
     }
 
@@ -41,7 +46,7 @@ class PackageArchitectureTest {
     @Test
     void controllersMustNotDependOnRepositories() {
         ArchRule rule = ArchRuleDefinition.noClasses().that().haveSimpleNameEndingWith("Controller")
-                .should().dependOnClassesThat().resideInAnyPackage("..infrastructure.repository..");
+                .should().dependOnClassesThat().resideInAnyPackage("..repository..");
         rule.check(classes);
     }
 }

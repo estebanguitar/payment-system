@@ -2,21 +2,22 @@ package com.example.paymentsystem.architecture.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.cancellation.domain.CancelType;
-import com.example.paymentsystem.cancellation.domain.PaymentCancel;
-import com.example.paymentsystem.customer.domain.Customer;
-import com.example.paymentsystem.outbox.domain.OutboxStatus;
-import com.example.paymentsystem.outbox.domain.PaymentOutbox;
-import com.example.paymentsystem.payment.domain.Payment;
-import com.example.paymentsystem.wallet.domain.Wallet;
-import com.example.paymentsystem.wallet.domain.WalletTransaction;
-import com.example.paymentsystem.cancellation.infrastructure.repository.PaymentCancelRepository;
-import com.example.paymentsystem.customer.infrastructure.repository.CustomerRepository;
-import com.example.paymentsystem.outbox.infrastructure.repository.PaymentOutboxRepository;
-import com.example.paymentsystem.payment.infrastructure.repository.PaymentRepository;
-import com.example.paymentsystem.wallet.infrastructure.repository.WalletRepository;
-import com.example.paymentsystem.wallet.infrastructure.repository.WalletTransactionRepository;
+import com.example.paymentsystem.domain.cancellation.CancelType;
+import com.example.paymentsystem.domain.cancellation.PaymentCancel;
+import com.example.paymentsystem.domain.customer.Customer;
+import com.example.paymentsystem.domain.outbox.OutboxStatus;
+import com.example.paymentsystem.domain.outbox.PaymentOutbox;
+import com.example.paymentsystem.domain.payment.Payment;
+import com.example.paymentsystem.domain.wallet.Wallet;
+import com.example.paymentsystem.domain.wallet.WalletTransaction;
+import com.example.paymentsystem.repository.cancellation.PaymentCancelRepository;
+import com.example.paymentsystem.repository.customer.CustomerRepository;
+import com.example.paymentsystem.repository.outbox.PaymentOutboxRepository;
+import com.example.paymentsystem.repository.payment.PaymentRepository;
+import com.example.paymentsystem.repository.wallet.WalletRepository;
+import com.example.paymentsystem.repository.wallet.WalletTransactionRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +81,8 @@ class DomainRepositoryQueryIntegrationTest {
         outboxRepository.saveAndFlush(PaymentOutbox.createPaymentRequested(
                 second.payment().getId(), "OUTBOX-" + second.suffix(), "{}", NOW));
 
-        assertThat(outboxRepository.findByStatusAndCreatedAtBeforeOrderByCreatedAtAsc(
-                OutboxStatus.INIT, NOW.minusMinutes(1), PageRequest.of(0, 1)))
+        assertThat(outboxRepository.findByStatusInAndCreatedAtBeforeOrderByCreatedAtAsc(
+                List.of(OutboxStatus.PENDING, OutboxStatus.RETRY), NOW.minusMinutes(1), PageRequest.of(0, 1)))
                 .extracting(PaymentOutbox::getId)
                 .containsExactly(old.getId());
     }
