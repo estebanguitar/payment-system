@@ -13,4 +13,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /** 원 결제에 연결된 지갑 거래를 발생 순서대로 조회한다. */
     List<WalletTransaction> findAllByPaymentIdOrderByCreatedAtAsc(Long paymentId);
+
+    /** 지갑의 모든 입출금 이력을 발생 순서대로 조회한다. */
+    List<WalletTransaction> findAllByWalletIdOrderByCreatedAtAsc(Long walletId);
 }

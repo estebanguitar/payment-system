@@ -1,6 +1,7 @@
 package com.example.paymentsystem.repository.pg;
 
 import com.example.paymentsystem.domain.pg.PgResponseLog;
+import com.example.paymentsystem.domain.pg.PgOperationType;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +10,8 @@ public interface PgResponseLogRepository extends JpaRepository<PgResponseLog, Lo
 
     /** 결제의 PG 응답 로그를 수신 순서대로 조회한다. */
     List<PgResponseLog> findAllByPaymentIdOrderByReceivedAtAsc(Long paymentId);
+
+    /** 결제 ID와 PG 작업 유형으로 응답 로그를 수신 순서대로 조회한다. */
+    List<PgResponseLog> findAllByPaymentIdAndOperationTypeOrderByReceivedAtAsc(
+            Long paymentId, PgOperationType operationType);
 }
