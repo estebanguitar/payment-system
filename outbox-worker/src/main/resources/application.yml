@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: outbox-worker
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/paymentdb;AUTO_SERVER=TRUE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8081}
+
+payment:
+  outbox:
+    enabled: true
+    fixed-delay: ${OUTBOX_FIXED_DELAY:1000}
+    orphan-threshold: ${OUTBOX_ORPHAN_THRESHOLD:60000}
+    batch-size: ${OUTBOX_BATCH_SIZE:50}
+    max-retry-count: ${OUTBOX_MAX_RETRY_COUNT:5}
+    lease-duration: ${OUTBOX_LEASE_DURATION:120000}
+  security:
+    encryption-key: ${PAYMENT_ENCRYPTION_SECRET:}
+  pg:
+    default-scenario: ${PAYMENT_PG_DEFAULT_SCENARIO:APPROVED}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

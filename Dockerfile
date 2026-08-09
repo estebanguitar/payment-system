@@ -3,6 +3,7 @@ WORKDIR /workspace
 
 COPY gradlew settings.gradle build.gradle ./
 COPY gradle ./gradle
+COPY outbox-worker/build.gradle ./outbox-worker/build.gradle
 RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
 
 COPY src ./src

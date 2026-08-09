@@ -60,3 +60,7 @@ tasks.named('jacocoTestReport') {
 		csv.required = false
 	}
 }
+
+tasks.named('jar') {
+	enabled = true
+}

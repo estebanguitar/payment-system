@@ -16,5 +16,22 @@ services:
       - payment-data:/data
     restart: unless-stopped
 
+  outbox-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: payment-outbox-worker:local
+    container_name: payment-outbox-worker
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/paymentdb;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE
+      PAYMENT_ENCRYPTION_SECRET: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      TZ: Asia/Seoul
+      JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -Duser.timezone=Asia/Seoul
+    ports:
+      - "8081:8081"
+    volumes:
+      - payment-data:/data
+    restart: unless-stopped
+
 volumes:
   payment-data:
