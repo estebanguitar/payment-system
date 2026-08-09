@@ -28,7 +28,8 @@ class OutboxServiceTest {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
         PaymentEventListener paymentListener = mock(PaymentEventListener.class);
         PaymentCancelEventListener cancelListener = mock(PaymentCancelEventListener.class);
-        OutboxRecoveryService service = new OutboxRecoveryService(repository, paymentListener, cancelListener,
+        OutboxQueryService queryService = mock(OutboxQueryService.class);
+        OutboxRecoveryService service = new OutboxRecoveryService(queryService, paymentListener, cancelListener,
                 mock(OutboxStatusService.class), new ObjectMapper());
         PaymentOutbox payment = PaymentOutbox.createPaymentRequested(1L, "K1", "{\"paymentId\":1}", LocalDateTime.now());
         ReflectionTestUtils.setField(payment, "id", 10L);
@@ -37,9 +38,9 @@ class OutboxServiceTest {
         ReflectionTestUtils.setField(cancel, "id", 11L);
         PaymentOutbox published = PaymentOutbox.createPaymentRequested(1L, "K3", "{\"paymentId\":1}", LocalDateTime.now());
         published.markPublished(LocalDateTime.now());
-        when(repository.findById(10L)).thenReturn(Optional.of(payment));
-        when(repository.findById(11L)).thenReturn(Optional.of(cancel));
-        when(repository.findById(12L)).thenReturn(Optional.of(published));
+        when(queryService.get(10L)).thenReturn(payment);
+        when(queryService.get(11L)).thenReturn(cancel);
+        when(queryService.get(12L)).thenReturn(published);
         service.recover(10L); service.recover(11L); service.recover(12L);
         verify(paymentListener).handle(org.mockito.ArgumentMatchers.any());
         verify(cancelListener).handle(org.mockito.ArgumentMatchers.any());
@@ -50,12 +51,24 @@ class OutboxServiceTest {
     void rejectInvalidPayload() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
         PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(1L, "K", "{}", LocalDateTime.now());
-        when(repository.findById(1L)).thenReturn(Optional.of(outbox));
+        OutboxQueryService queryService = mock(OutboxQueryService.class);
+        when(queryService.get(1L)).thenReturn(outbox);
         OutboxStatusService status = mock(OutboxStatusService.class);
-        OutboxRecoveryService service = new OutboxRecoveryService(repository, mock(PaymentEventListener.class),
+        OutboxRecoveryService service = new OutboxRecoveryService(queryService, mock(PaymentEventListener.class),
                 mock(PaymentCancelEventListener.class), status, new ObjectMapper());
         assertThatThrownBy(() -> service.recover(1L)).isInstanceOf(RuntimeException.class);
         verify(status).recordFailure(1L);
+    }
+
+    /** OutboxQueryService.get이 아웃박스를 반환하고 미존재 ID를 시스템 오류로 변환하는지 확인한다. */
+    @Test
+    void queryOutbox() {
+        PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
+        PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(1L, "K", "{}", LocalDateTime.now());
+        when(repository.findById(1L)).thenReturn(Optional.of(outbox));
+        OutboxQueryService service = new OutboxQueryService(repository);
+        assertThat(service.get(1L)).isSameAs(outbox);
+        assertThatThrownBy(() -> service.get(2L)).isInstanceOf(RuntimeException.class);
     }
 
     /** recordFailure가 횟수를 증가시키고 한도 도달 시 FAILED로 전환하는지 확인한다. */

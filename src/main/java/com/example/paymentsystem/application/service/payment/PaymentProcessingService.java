@@ -8,7 +8,6 @@ import com.example.paymentsystem.domain.exception.InsufficientBalanceException;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.domain.entity.payment.Payment;
 import com.example.paymentsystem.domain.entity.payment.PaymentFailureReason;
-import com.example.paymentsystem.domain.entity.payment.PaymentStatus;
 import com.example.paymentsystem.domain.entity.pg.PgResponseLog;
 import com.example.paymentsystem.domain.entity.wallet.Wallet;
 import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
@@ -73,12 +72,8 @@ public class PaymentProcessingService {
     }
 
     private Payment pendingPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
+        return paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorCode.PAYMENT_NOT_FOUND));
-        if (payment.getStatus() != PaymentStatus.PENDING) {
-            return payment;
-        }
-        return payment;
     }
 
     private PaymentOutbox initOutbox(Long outboxId) {
