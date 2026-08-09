@@ -1,0 +1,170 @@
+# 결제 시스템 API 명세서
+
+## 공통 응답 구조 (ApiResponse<T>)
+
+```json
+{
+  "code": "OK",
+  "message": "정상적으로 처리되었습니다.",
+  "returnObject": {}
+}
+```
+
+---
+
+## 1. 지갑 (Wallet) API
+
+### 1.1 지갑 생성
+- **HTTP Method**: `POST /api/v1/wallets`
+- **Request Body**:
+  ```json
+  {
+    "customerId": "CUST-001"
+  }
+  ```
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "지갑이 생성되었습니다.",
+    "returnObject": {
+      "walletId": 1,
+      "customerId": "CUST-001",
+      "balance": 0,
+      "createdAt": "2026-08-08T09:00:00"
+    }
+  }
+  ```
+
+### 1.2 지갑 잔액 조회
+- **HTTP Method**: `GET /api/v1/wallets/{customerId}`
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "정상적으로 처리되었습니다.",
+    "returnObject": {
+      "walletId": 1,
+      "customerId": "CUST-001",
+      "balance": 50000
+    }
+  }
+  ```
+
+### 1.3 지갑 충전
+- **HTTP Method**: `POST /api/v1/wallets/{customerId}/top-up`
+- **Header**: `Idempotency-Key: <UUID>`
+- **Request Body**:
+  ```json
+  {
+    "amount": 10000
+  }
+  ```
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "충전이 완료되었습니다.",
+    "returnObject": {
+      "transactionId": 101,
+      "customerId": "CUST-001",
+      "amount": 10000,
+      "balanceAfter": 60000
+    }
+  }
+  ```
+
+---
+
+## 2. 결제 (Payment) API
+
+### 2.1 결제 요청
+- **HTTP Method**: `POST /api/v1/payments`
+- **Header**: `Idempotency-Key: <UUID>`
+- **Request Body**:
+  ```json
+  {
+    "customerId": "CUST-001",
+    "amount": 15000
+  }
+  ```
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "결제가 완료되었습니다.",
+    "returnObject": {
+      "paymentId": 1,
+      "customerId": "CUST-001",
+      "amount": 15000,
+      "status": "COMPLETED",
+      "failureReason": null,
+      "createdAt": "2026-08-08T09:05:00"
+    }
+  }
+  ```
+
+### 2.2 결제 취소 (전액 / 부분)
+- **HTTP Method**: `POST /api/v1/payments/{paymentId}/cancel`
+- **Header**: `Idempotency-Key: <UUID>`
+- **Request Body**:
+  ```json
+  {
+    "amount": 5000,
+    "cancelType": "PARTIAL"
+  }
+  ```
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "결제 취소가 완료되었습니다.",
+    "returnObject": {
+      "cancelId": 1,
+      "paymentId": 1,
+      "cancelAmount": 5000,
+      "cancelType": "PARTIAL",
+      "paymentStatus": "PARTIALLY_CANCELED",
+      "accumulatedCancelAmount": 5000,
+      "remainingCancelableAmount": 10000
+    }
+  }
+  ```
+
+---
+
+## 3. 이력 및 모니터링 조회 API
+
+### 3.1 고객용 결제 내역 조회
+- **HTTP Method**: `GET /api/v1/customers/{customerId}/payments`
+- **Query Params**: `page=1&size=20`
+- **Response (200 OK)**:
+  ```json
+  {
+    "code": "OK",
+    "message": "정상적으로 처리되었습니다.",
+    "returnObject": {
+      "content": [ ... ],
+      "page": 1,
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1
+    }
+  }
+  ```
+
+### 3.2 운영자용 결제 검색 API
+- **HTTP Method**: `GET /api/v1/ops/payments`
+- **Query Params**: `paymentId=&customerId=&status=&failureReason=&startDate=&endDate=&page=1&size=20`
+- **Response (200 OK)**: 운영 정보, 취소 이력 및 PG 응답 메타/암호화 로그 참조 정보 포함.
+
+### 3.3 감사 로그 API 제외
+
+감사 로그는 내부 API 요청 이력으로만 암호화 저장한다. 검색·단건 조회·삭제 API는 공개하지 않는다.
+# 최신화 메모 (2026-08-09)
+
+## 경량 대사 Break 조회
+
+- `GET /api/v1/ops/reconciliation-breaks`
+- 탐지 시각 역순으로 결제–지갑 금액, 결제–PG 상태, PG 로그 누락, 지갑 잔고 불일치를 조회한다.
+- 생성은 스케줄러 내부 동작으로만 수행하며 수정·삭제 API는 제공하지 않는다.

@@ -38,6 +38,9 @@ payment:
     orphan-threshold: 60000
     batch-size: 50
     max-retry-count: 5
+  reconciliation:
+    enabled: false
+    fixed-delay: 300000
 
 management:
   endpoints:

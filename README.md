@@ -1,59 +1,34 @@
 # Payment System
 
-가상의 외부 결제 사업자 API와 연동해 결제 원장, 고객 지갑, 취소·환불 및 운영 모니터링 정보를 관리하는 Spring Boot 기반 백엔드 프로젝트입니다.
+결제·취소, 고객 지갑, 외부 PG 연동을 다루는 Spring Boot 기반 레이어드 모놀리스입니다. 현재 기준은 [요구사항 정의서](docs/current/requirements.md)와 [아키텍처 정의서](docs/current/architecture.md)입니다.
 
-현재 요구사항 정의가 완료되었으며, 아키텍처와 구현 계획을 수립하기 전 단계입니다. 구현 범위와 동작은 [요구사항 정의서](docs/project/requirements-definition.md)를 기준으로 합니다.
+## 구현 범위
 
-## 핵심 범위
+- 결제 생성과 전액·부분 취소
+- 고객 지갑 생성·충전·잔액 조회 및 결제 차감·취소 환불
+- 결제·충전·취소 요청 멱등성
+- 결제와 함께 저장되는 Transactional Outbox
+- 커밋 후 즉시 처리와 `PENDING/RETRY` 복구 스케줄러가 공유하는 `OutboxProcessor`
+- 호출 주체·URL·시각·요청·응답 감사 로그와 요청·응답 원문 AES-256-GCM 암호화
+- 결제–지갑 금액, 결제–PG 상태, 지갑 거래–잔고 경량 대사 및 Break 조회
+- Swagger UI와 JaCoCo HTML 테스트 리포트
 
-- 결제 요청 접수 및 `PENDING` 원장 생성
-- 외부 결제 승인 결과 반영
-- 고객 지갑 생성, 충전, 잔액 조회 및 결제 차감
-- 잔액 부족과 외부·내부 시스템 오류 이력 관리
-- 전액·부분 취소와 고객 지갑 환불
-- 결제·충전·취소 요청의 멱등성 보장
-- 고객용 결제 이력과 운영자용 모니터링 조회
-- 외부 API 응답 원문의 암호화 저장
+## 구조
 
-## 결제 처리 흐름
+운영 코드는 역할이 바로 드러나는 `controller`, `service`, `repository`, `domain`, `dto`, `integration`, `scheduler`, `common` 패키지로 구성합니다. 결제와 결제 취소는 하나의 `payment` 도메인으로 관리합니다. 테스트는 `src/test/unit/java`와 `src/test/integration/java` 아래에서 다시 도메인별로 구분합니다.
 
-1. 결제 요청을 `PENDING` 상태로 저장합니다.
-2. 외부 결제 API에 승인을 요청합니다.
-3. 승인 성공 후 고객 지갑 잔액을 확인합니다.
-4. 잔액이 충분하면 지갑 차감과 결제의 `COMPLETED` 전환을 하나의 트랜잭션으로 처리합니다.
-5. 잔액이 부족하면 `FAILED/INSUFFICIENT_BALANCE`로 기록합니다.
-6. 외부 API 오류·타임아웃 또는 내부 장애는 `FAILED/SYSTEM_ERROR`로 기록합니다.
+## 실행과 검증
 
-## 기술 기준선
-
-- Java 17
-- Spring Boot 3.5.16
-- Gradle 8.14.3 Wrapper
-- Spring Web MVC, Spring Data JPA, Bean Validation, Actuator
-- H2 Database, Flyway
-- JUnit 5
-
-## 실행 및 테스트
-
-Windows:
+Java 17이 필요합니다.
 
 ```powershell
 .\gradlew.bat bootRun
-.\gradlew.bat test
+.\gradlew.bat clean test jacocoTestReport bootJar
 ```
 
-macOS/Linux:
+테스트 커버리지 HTML은 `build/reports/jacoco/test/html/index.html`에서 확인합니다.
 
-```bash
-./gradlew bootRun
-./gradlew test
-```
-
-H2는 인메모리 모드로 사용하므로 애플리케이션을 재시작하면 데이터가 초기화됩니다.
-
-### Docker Compose로 동일 환경 실행
-
-Docker Engine과 Docker Compose v2가 설치된 PC에서는 다음 명령으로 Java 17, 애플리케이션 설정 및 파일 기반 H2 환경을 동일하게 실행할 수 있습니다.
+Docker Compose로 동일한 로컬 환경을 실행할 수 있습니다.
 
 ```bash
 docker compose up --build -d
@@ -63,22 +38,17 @@ docker compose logs -f payment-system
 - API: `http://localhost:8080`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - 상태 확인: `http://localhost:8080/actuator/health`
-- 데이터는 `payment-data` named volume에 유지됩니다.
+- 경량 대사 Break: `GET /api/v1/ops/reconciliation-breaks`
 
-컨테이너를 중지하려면 `docker compose down`을 사용합니다. 데이터까지 초기화하는 `docker compose down -v`는 저장된 개발 데이터를 삭제하므로 명시적으로 초기화할 때만 사용합니다. Compose에 포함된 암호화 키는 로컬 재현 전용이며 운영 환경에서는 secret manager로 교체해야 합니다.
+로컬 데이터는 `payment-data` 볼륨에 유지됩니다. 데이터까지 초기화할 때만 `docker compose down -v`를 사용합니다. 운영 환경에서는 저장소의 기본 암호화 키를 Secret Manager 등 외부 비밀 저장소로 교체해야 합니다.
 
 ## 문서
 
-- [요구사항 정의서](docs/project/requirements-definition.md): 제품 범위, 기능·비기능 요구사항, 인수 기준 및 확정 정책
-- [프로젝트 작업 원칙](docs/project/working-agreements.md): 기술 기준선, Git 작업 및 문서화 원칙
+- [현재 기준 문서 목록](docs/current/README.md)
+- [요구사항 정의서](docs/current/requirements.md)
+- [아키텍처 정의서](docs/current/architecture.md)
+- [API 명세서](docs/current/api-spec.md)
+- [구현계획](docs/current/implementation-plan.md)
+- [과거 문서](docs/archive)
 
-아키텍처 설계서, ADR 및 구현 계획은 구현 착수 전에 작성하고 검토합니다.
-
-## 1페이즈 제외 범위
-
-- 실제 PG사 및 금융망 연동
-- 인증·인가 및 사용자 개인정보 관리
-- 운영 환경 배포, 고가용성 및 대규모 트래픽 대응
-- 외부 알림, 관리자 화면 및 대시보드 UI
-
-제외된 기능성 요구사항은 2페이즈부터 검토합니다.
+실제 PG·금융망 연동, 인증·인가, 운영 배포 및 대규모 부하 검증은 현재 범위에 포함하지 않습니다.
