@@ -1,5 +1,13 @@
 package com.example.paymentsystem.infrastructure.pg;
 
+import com.example.paymentsystem.application.port.out.pg.PgApprovalCommand;
+import com.example.paymentsystem.application.port.out.pg.PgApprovalResult;
+import com.example.paymentsystem.application.port.out.pg.PgCancelCommand;
+import com.example.paymentsystem.application.port.out.pg.PgCancelResult;
+import com.example.paymentsystem.application.port.out.pg.PgClient;
+import com.example.paymentsystem.application.port.out.pg.PgClientException;
+import com.example.paymentsystem.application.port.out.pg.PgErrorType;
+import com.example.paymentsystem.application.port.out.pg.PgResultStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
@@ -21,9 +29,9 @@ public class FakePgClient implements PgClient {
 
     /** 요청 시나리오에 따라 결제 승인 응답 또는 분류된 기술 예외를 반환한다. */
     @Override
-    public PgApprovalResponse approve(PgApprovalRequest request) {
+    public PgApprovalResult approve(PgApprovalCommand request) {
         validateApprovalRequest(request);
-        PgScenario scenario = resolveScenario(request.getScenario());
+        PgScenario scenario = properties.defaultScenario();
         throwIfTechnicalFailure(scenario);
 
         PgResultStatus status = scenario == PgScenario.REJECTED
@@ -38,7 +46,7 @@ public class FakePgClient implements PgClient {
         payload.put("responseCode", responseCode);
         payload.put("amount", request.getAmount());
 
-        return PgApprovalResponse.builder()
+        return PgApprovalResult.builder()
                 .status(status)
                 .pgTransactionId(transactionId)
                 .responseCode(responseCode)
@@ -48,9 +56,9 @@ public class FakePgClient implements PgClient {
 
     /** 요청 시나리오에 따라 결제 취소 응답 또는 분류된 기술 예외를 반환한다. */
     @Override
-    public PgCancelResponse cancel(PgCancelRequest request) {
+    public PgCancelResult cancel(PgCancelCommand request) {
         validateCancelRequest(request);
-        PgScenario scenario = resolveScenario(request.getScenario());
+        PgScenario scenario = properties.defaultScenario();
         throwIfTechnicalFailure(scenario);
 
         PgResultStatus status = scenario == PgScenario.REJECTED
@@ -65,16 +73,12 @@ public class FakePgClient implements PgClient {
         payload.put("responseCode", responseCode);
         payload.put("amount", request.getAmount());
 
-        return PgCancelResponse.builder()
+        return PgCancelResult.builder()
                 .status(status)
                 .pgCancelTransactionId(transactionId)
                 .responseCode(responseCode)
                 .rawPayload(toJson(payload))
                 .build();
-    }
-
-    private PgScenario resolveScenario(PgScenario scenario) {
-        return scenario == null ? properties.defaultScenario() : scenario;
     }
 
     private static void throwIfTechnicalFailure(PgScenario scenario) {
@@ -104,7 +108,7 @@ public class FakePgClient implements PgClient {
         }
     }
 
-    private static void validateApprovalRequest(PgApprovalRequest request) {
+    private static void validateApprovalRequest(PgApprovalCommand request) {
         if (request == null || request.getPaymentId() == null || request.getPaymentId() <= 0
                 || request.getCustomerId() == null || request.getCustomerId().isBlank()
                 || request.getAmount() <= 0) {
@@ -113,7 +117,7 @@ public class FakePgClient implements PgClient {
         requireIdempotencyKey(request.getIdempotencyKey());
     }
 
-    private static void validateCancelRequest(PgCancelRequest request) {
+    private static void validateCancelRequest(PgCancelCommand request) {
         if (request == null || request.getPaymentId() == null || request.getPaymentId() <= 0
                 || request.getCancelId() == null || request.getCancelId() <= 0
                 || request.getAmount() <= 0) {

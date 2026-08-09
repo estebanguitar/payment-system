@@ -1,4 +1,4 @@
-package com.example.paymentsystem.domain.wallet;
+package com.example.paymentsystem.domain.entity.wallet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

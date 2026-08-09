@@ -1,5 +1,6 @@
 package com.example.paymentsystem.infrastructure.security;
 
+import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

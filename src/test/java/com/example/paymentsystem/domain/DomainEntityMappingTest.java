@@ -2,14 +2,14 @@ package com.example.paymentsystem.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.domain.cancel.CancelType;
-import com.example.paymentsystem.domain.cancel.PaymentCancel;
-import com.example.paymentsystem.domain.customer.Customer;
-import com.example.paymentsystem.domain.outbox.PaymentOutbox;
-import com.example.paymentsystem.domain.payment.Payment;
-import com.example.paymentsystem.domain.pg.PgResponseLog;
-import com.example.paymentsystem.domain.wallet.Wallet;
-import com.example.paymentsystem.domain.wallet.WalletTransaction;
+import com.example.paymentsystem.domain.entity.cancel.CancelType;
+import com.example.paymentsystem.domain.entity.cancel.PaymentCancel;
+import com.example.paymentsystem.domain.entity.customer.Customer;
+import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
+import com.example.paymentsystem.domain.entity.payment.Payment;
+import com.example.paymentsystem.domain.entity.pg.PgResponseLog;
+import com.example.paymentsystem.domain.entity.wallet.Wallet;
+import com.example.paymentsystem.domain.entity.wallet.WalletTransaction;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
 package com.example.paymentsystem.infrastructure.security;
 
+import com.example.paymentsystem.application.port.out.security.PayloadEncryptor;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;

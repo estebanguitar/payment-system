@@ -1,4 +1,4 @@
-package com.example.paymentsystem.domain.outbox;
+package com.example.paymentsystem.domain.entity.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

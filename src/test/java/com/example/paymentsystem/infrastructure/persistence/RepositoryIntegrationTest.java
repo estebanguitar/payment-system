@@ -2,17 +2,17 @@ package com.example.paymentsystem.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.paymentsystem.domain.customer.Customer;
-import com.example.paymentsystem.domain.payment.Payment;
-import com.example.paymentsystem.domain.pg.PgResponseLog;
-import com.example.paymentsystem.domain.wallet.Wallet;
-import com.example.paymentsystem.infrastructure.persistence.customer.CustomerRepository;
-import com.example.paymentsystem.infrastructure.persistence.idempotency.IdempotencyRecord;
-import com.example.paymentsystem.infrastructure.persistence.idempotency.IdempotencyRecordRepository;
-import com.example.paymentsystem.infrastructure.persistence.idempotency.IdempotencyRequestType;
-import com.example.paymentsystem.infrastructure.persistence.payment.PaymentRepository;
-import com.example.paymentsystem.infrastructure.persistence.pg.PgResponseLogRepository;
-import com.example.paymentsystem.infrastructure.persistence.wallet.WalletRepository;
+import com.example.paymentsystem.domain.entity.customer.Customer;
+import com.example.paymentsystem.domain.entity.payment.Payment;
+import com.example.paymentsystem.domain.entity.pg.PgResponseLog;
+import com.example.paymentsystem.domain.entity.wallet.Wallet;
+import com.example.paymentsystem.infrastructure.repository.customer.CustomerRepository;
+import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRecord;
+import com.example.paymentsystem.infrastructure.repository.idempotency.IdempotencyRecordRepository;
+import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
+import com.example.paymentsystem.infrastructure.repository.payment.PaymentRepository;
+import com.example.paymentsystem.infrastructure.repository.pg.PgResponseLogRepository;
+import com.example.paymentsystem.infrastructure.repository.wallet.WalletRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
