@@ -1,8 +1,8 @@
 package com.example.paymentsystem.infrastructure.outbox;
 
-import com.example.paymentsystem.domain.outbox.OutboxStatus;
-import com.example.paymentsystem.domain.outbox.PaymentOutbox;
-import com.example.paymentsystem.infrastructure.persistence.outbox.PaymentOutboxRepository;
+import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
+import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
+import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;

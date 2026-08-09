@@ -3,8 +3,8 @@ package com.example.paymentsystem.infrastructure.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.paymentsystem.infrastructure.persistence.idempotency.IdempotencyRecord;
-import com.example.paymentsystem.infrastructure.persistence.idempotency.IdempotencyRequestType;
+import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRecord;
+import com.example.paymentsystem.domain.entity.idempotency.IdempotencyRequestType;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 

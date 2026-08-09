@@ -7,9 +7,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.paymentsystem.domain.outbox.OutboxStatus;
-import com.example.paymentsystem.domain.outbox.PaymentOutbox;
-import com.example.paymentsystem.infrastructure.persistence.outbox.PaymentOutboxRepository;
+import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
+import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
+import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
