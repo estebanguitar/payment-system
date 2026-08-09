@@ -1,7 +1,7 @@
 package com.example.paymentsystem.infrastructure;
 
 import com.example.paymentsystem.pg.application.port.out.security.PayloadEncryptor;
-import com.example.paymentsystem.infrastructure.outbox.OutboxProperties;
+import com.example.paymentsystem.outbox.infrastructure.scheduling.OutboxProperties;
 import com.example.paymentsystem.pg.infrastructure.adapter.PgProperties;
 import com.example.paymentsystem.pg.infrastructure.security.AesGcmPayloadEncryptor;
 import com.example.paymentsystem.pg.infrastructure.security.PaymentSecurityProperties;

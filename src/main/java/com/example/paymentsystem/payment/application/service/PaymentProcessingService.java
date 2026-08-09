@@ -5,13 +5,13 @@ import com.example.paymentsystem.shared.application.exception.ApplicationExcepti
 import com.example.paymentsystem.pg.application.port.out.pg.PgApprovalResult;
 import com.example.paymentsystem.pg.application.port.out.security.PayloadEncryptor;
 import com.example.paymentsystem.shared.domain.exception.InsufficientBalanceException;
-import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
+import com.example.paymentsystem.outbox.domain.PaymentOutbox;
 import com.example.paymentsystem.payment.domain.Payment;
 import com.example.paymentsystem.payment.domain.PaymentFailureReason;
 import com.example.paymentsystem.pg.domain.PgResponseLog;
 import com.example.paymentsystem.wallet.domain.Wallet;
 import com.example.paymentsystem.wallet.domain.WalletTransaction;
-import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
+import com.example.paymentsystem.outbox.infrastructure.repository.PaymentOutboxRepository;
 import com.example.paymentsystem.payment.infrastructure.repository.PaymentRepository;
 import com.example.paymentsystem.pg.infrastructure.repository.PgResponseLogRepository;
 import com.example.paymentsystem.wallet.infrastructure.repository.WalletRepository;
