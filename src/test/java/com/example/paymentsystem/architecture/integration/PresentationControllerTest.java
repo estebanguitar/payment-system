@@ -1,4 +1,4 @@
-package com.example.paymentsystem.presentation;
+package com.example.paymentsystem.architecture.integration;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

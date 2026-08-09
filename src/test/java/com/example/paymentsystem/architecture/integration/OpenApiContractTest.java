@@ -1,4 +1,4 @@
-package com.example.paymentsystem.presentation;
+package com.example.paymentsystem.architecture.integration;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

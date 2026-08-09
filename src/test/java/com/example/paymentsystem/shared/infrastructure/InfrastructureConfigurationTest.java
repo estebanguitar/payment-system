@@ -1,4 +1,4 @@
-package com.example.paymentsystem.infrastructure;
+package com.example.paymentsystem.shared.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,4 +1,4 @@
-package com.example.paymentsystem.application.service;
+package com.example.paymentsystem.architecture.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
