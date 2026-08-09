@@ -1,0 +1,12 @@
+package com.example.paymentsystem.reconciliation.presentation.dto;
+import com.example.paymentsystem.reconciliation.domain.*; import com.example.paymentsystem.reconciliation.domain.ReconciliationEnums.*; import jakarta.validation.constraints.*; import java.time.LocalDateTime; import java.util.List;
+/** 대사 운영 API의 요청·응답 계약을 한 경계에 모은다. */
+public final class ReconciliationDtos {private ReconciliationDtos(){}
+ public record RunRequest(@NotNull LocalDateTime rangeStart,@NotNull LocalDateTime rangeEnd,@NotBlank String requestedBy){}
+ public record ActionRequest(@NotNull ActionType actionType,@NotBlank String operatorId,@NotBlank @Size(max=500) String reason,@Size(max=200) String externalReference){}
+ public record RecheckRequest(@NotBlank String operatorId,@NotBlank @Size(max=500) String reason){}
+ public record RunResponse(Long id,String runKey,RunStatus status,LocalDateTime rangeStart,LocalDateTime rangeEnd,long checkedCount,long mismatchCount,long failedCount){public static RunResponse from(ReconciliationRun r){return new RunResponse(r.getId(),r.getRunKey(),r.getStatus(),r.getRangeStart(),r.getRangeEnd(),r.getCheckedCount(),r.getMismatchCount(),r.getFailedCount());}}
+ public record CaseResponse(Long id,String caseKey,MismatchType mismatchType,Severity severity,CaseStatus status,String customerId,Long walletId,Long paymentId,Long cancelId,Long outboxId,String expectedValue,String actualValue,String evidence,LocalDateTime firstDetectedAt,LocalDateTime lastDetectedAt){public static CaseResponse from(ReconciliationCase c){return new CaseResponse(c.getId(),c.getCaseKey(),c.getMismatchType(),c.getSeverity(),c.getStatus(),c.getCustomerId(),c.getWalletId(),c.getPaymentId(),c.getCancelId(),c.getOutboxId(),c.getExpectedValue(),c.getActualValue(),c.getEvidence(),c.getFirstDetectedAt(),c.getLastDetectedAt());}}
+ public record ActionResponse(ActionType actionType,CaseStatus fromStatus,CaseStatus toStatus,String operatorId,String reason,String externalReference,LocalDateTime createdAt){public static ActionResponse from(ReconciliationActionHistory h){return new ActionResponse(h.getActionType(),h.getFromStatus(),h.getToStatus(),h.getOperatorId(),h.getReason(),h.getExternalReference(),h.getCreatedAt());}}
+ public record CaseDetailResponse(CaseResponse reconciliationCase,List<ActionResponse> actions){}
+}
