@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.paymentsystem.application.port.in.outbox.OutboxRecoveryUseCase;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
@@ -24,7 +25,7 @@ class OutboxSchedulerTest {
     @Test
     void continueRecoveryAfterIndividualFailure() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        OutboxRecoveryPort recoveryPort = mock(OutboxRecoveryPort.class);
+        OutboxRecoveryUseCase recoveryPort = mock(OutboxRecoveryUseCase.class);
         PaymentOutbox first = mock(PaymentOutbox.class);
         PaymentOutbox second = mock(PaymentOutbox.class);
         when(first.getId()).thenReturn(1L);
@@ -49,7 +50,7 @@ class OutboxSchedulerTest {
     @Test
     void skipCandidateAtRetryLimit() {
         PaymentOutboxRepository repository = mock(PaymentOutboxRepository.class);
-        OutboxRecoveryPort recoveryPort = mock(OutboxRecoveryPort.class);
+        OutboxRecoveryUseCase recoveryPort = mock(OutboxRecoveryUseCase.class);
         PaymentOutbox exhausted = mock(PaymentOutbox.class);
         when(exhausted.getId()).thenReturn(1L);
         when(exhausted.getRetryCount()).thenReturn(5);

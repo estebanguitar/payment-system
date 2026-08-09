@@ -55,13 +55,14 @@ public class PaymentOutbox {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    private PaymentOutbox(Long paymentId, String idempotencyKey, String payload, LocalDateTime now) {
+    private PaymentOutbox(Long paymentId, String idempotencyKey, OutboxEventType eventType,
+                          String payload, LocalDateTime now) {
         requireId(paymentId);
         this.idempotencyKey = requireText(idempotencyKey, "결제 멱등키는 필수입니다.");
         this.payload = requireText(payload, "아웃박스 payload는 필수입니다.");
         requireNow(now);
         this.paymentId = paymentId;
-        this.eventType = OutboxEventType.PAYMENT_REQUESTED;
+        this.eventType = eventType;
         this.status = OutboxStatus.INIT;
         this.retryCount = 0;
         this.createdAt = now;
@@ -71,7 +72,14 @@ public class PaymentOutbox {
     /** 결제 요청 이벤트를 아직 발행되지 않은 INIT 상태로 생성한다. */
     public static PaymentOutbox createPaymentRequested(Long paymentId, String idempotencyKey,
                                                        String payload, LocalDateTime now) {
-        return new PaymentOutbox(paymentId, idempotencyKey, payload, now);
+        return new PaymentOutbox(paymentId, idempotencyKey, OutboxEventType.PAYMENT_REQUESTED, payload, now);
+    }
+
+    /** 결제 취소 요청 이벤트를 아직 발행되지 않은 INIT 상태로 생성한다. */
+    public static PaymentOutbox createPaymentCancelRequested(Long paymentId, String idempotencyKey,
+                                                             String payload, LocalDateTime now) {
+        return new PaymentOutbox(
+                paymentId, idempotencyKey, OutboxEventType.PAYMENT_CANCEL_REQUESTED, payload, now);
     }
 
     /** 발행 대기 중인 이벤트를 정상 발행 완료 상태로 전환한다. */

@@ -2,6 +2,7 @@ package com.example.paymentsystem.infrastructure.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.paymentsystem.application.port.in.outbox.OutboxRecoveryUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class OutboxEnabledConfigurationTest {
 
     @MockitoBean
-    private OutboxRecoveryPort recoveryPort;
+    private OutboxRecoveryUseCase recoveryPort;
 
     @Autowired
     private OutboxScheduleDelayProvider delayProvider;

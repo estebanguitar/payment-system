@@ -1,5 +1,6 @@
 package com.example.paymentsystem.infrastructure.outbox;
 
+import com.example.paymentsystem.application.port.in.outbox.OutboxRecoveryUseCase;
 import com.example.paymentsystem.domain.entity.outbox.OutboxStatus;
 import com.example.paymentsystem.domain.entity.outbox.PaymentOutbox;
 import com.example.paymentsystem.infrastructure.repository.outbox.PaymentOutboxRepository;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
 
     private final PaymentOutboxRepository outboxRepository;
-    private final OutboxRecoveryPort recoveryPort;
+    private final OutboxRecoveryUseCase recoveryPort;
     private final OutboxProperties properties;
     private final Clock clock;
 

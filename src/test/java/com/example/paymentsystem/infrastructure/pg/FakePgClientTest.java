@@ -3,6 +3,13 @@ package com.example.paymentsystem.infrastructure.pg;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.paymentsystem.application.port.out.pg.PgApprovalCommand;
+import com.example.paymentsystem.application.port.out.pg.PgApprovalResult;
+import com.example.paymentsystem.application.port.out.pg.PgCancelCommand;
+import com.example.paymentsystem.application.port.out.pg.PgCancelResult;
+import com.example.paymentsystem.application.port.out.pg.PgClientException;
+import com.example.paymentsystem.application.port.out.pg.PgErrorType;
+import com.example.paymentsystem.application.port.out.pg.PgResultStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +28,7 @@ class FakePgClientTest {
     /** 승인 응답에 거래 ID, 성공 코드 및 원문 JSON이 포함되는지 확인한다. */
     @Test
     void approvePayment() {
-        PgApprovalResponse response = pgClient.approve(approvalRequest(PgScenario.APPROVED));
+        PgApprovalResult response = pgClient.approve(approvalRequest());
 
         assertThat(response.getStatus()).isEqualTo(PgResultStatus.APPROVED);
         assertThat(response.getResponseCode()).isEqualTo("0000");
@@ -31,8 +38,8 @@ class FakePgClientTest {
     /** 동일 멱등키의 반복 승인 요청이 같은 PG 거래 ID를 반환하는지 확인한다. */
     @Test
     void returnDeterministicTransactionId() {
-        PgApprovalResponse first = pgClient.approve(approvalRequest(PgScenario.APPROVED));
-        PgApprovalResponse second = pgClient.approve(approvalRequest(PgScenario.APPROVED));
+        PgApprovalResult first = pgClient.approve(approvalRequest());
+        PgApprovalResult second = pgClient.approve(approvalRequest());
 
         assertThat(second.getPgTransactionId()).isEqualTo(first.getPgTransactionId());
         assertThat(second.getRawPayload()).isEqualTo(first.getRawPayload());
@@ -45,7 +52,8 @@ class FakePgClientTest {
     /** 거절 시나리오가 예외가 아닌 명시적 거절 응답을 반환하는지 확인한다. */
     @Test
     void rejectPayment() {
-        PgApprovalResponse response = pgClient.approve(approvalRequest(PgScenario.REJECTED));
+        pgClient = new FakePgClient(new ObjectMapper(), new PgProperties(PgScenario.REJECTED));
+        PgApprovalResult response = pgClient.approve(approvalRequest());
 
         assertThat(response.getStatus()).isEqualTo(PgResultStatus.REJECTED);
         assertThat(response.getResponseCode()).isEqualTo("REJECTED");
@@ -54,10 +62,12 @@ class FakePgClientTest {
     /** 오류와 타임아웃이 서로 다른 기술 오류 유형으로 전달되는지 확인한다. */
     @Test
     void classifyErrorAndTimeout() {
-        assertThatThrownBy(() -> pgClient.approve(approvalRequest(PgScenario.ERROR)))
+        FakePgClient errorClient = new FakePgClient(new ObjectMapper(), new PgProperties(PgScenario.ERROR));
+        FakePgClient timeoutClient = new FakePgClient(new ObjectMapper(), new PgProperties(PgScenario.TIMEOUT));
+        assertThatThrownBy(() -> errorClient.approve(approvalRequest()))
                 .isInstanceOfSatisfying(PgClientException.class,
                         exception -> assertThat(exception.getErrorType()).isEqualTo(PgErrorType.ERROR));
-        assertThatThrownBy(() -> pgClient.approve(approvalRequest(PgScenario.TIMEOUT)))
+        assertThatThrownBy(() -> timeoutClient.approve(approvalRequest()))
                 .isInstanceOfSatisfying(PgClientException.class,
                         exception -> assertThat(exception.getErrorType()).isEqualTo(PgErrorType.TIMEOUT));
     }
@@ -65,12 +75,11 @@ class FakePgClientTest {
     /** 결제 취소 승인 응답이 취소 거래 ID와 원문 JSON을 제공하는지 확인한다. */
     @Test
     void approveCancellation() {
-        PgCancelResponse response = pgClient.cancel(PgCancelRequest.builder()
+        PgCancelResult response = pgClient.cancel(PgCancelCommand.builder()
                 .paymentId(1L)
                 .cancelId(2L)
                 .idempotencyKey("CANCEL-IDEMPOTENCY-1")
                 .amount(3_000)
-                .scenario(PgScenario.APPROVED)
                 .build());
 
         assertThat(response.getStatus()).isEqualTo(PgResultStatus.APPROVED);
@@ -84,17 +93,16 @@ class FakePgClientTest {
         FakePgClient rejectedClient = new FakePgClient(
                 new ObjectMapper(), new PgProperties(PgScenario.REJECTED));
 
-        assertThat(rejectedClient.approve(approvalRequest(null)).getStatus())
+        assertThat(rejectedClient.approve(approvalRequest()).getStatus())
                 .isEqualTo(PgResultStatus.REJECTED);
     }
 
-    private static PgApprovalRequest approvalRequest(PgScenario scenario) {
-        return PgApprovalRequest.builder()
+    private static PgApprovalCommand approvalRequest() {
+        return PgApprovalCommand.builder()
                 .paymentId(1L)
                 .idempotencyKey("PAY-IDEMPOTENCY-1")
                 .customerId("CUST-001")
                 .amount(10_000)
-                .scenario(scenario)
                 .build();
     }
 }
