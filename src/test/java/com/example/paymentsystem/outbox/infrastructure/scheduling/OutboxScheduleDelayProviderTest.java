@@ -11,7 +11,7 @@ class OutboxScheduleDelayProviderTest {
     @Test
     void provideValidatedFixedDelay() {
         OutboxScheduleDelayProvider provider = new OutboxScheduleDelayProvider(
-                new OutboxProperties(true, 12_345, 60_000, 50, 5));
+                new OutboxProperties(true, 12_345, 60_000, 50, 5, 120_000));
 
         assertThat(provider.fixedDelay()).isEqualTo(12_345);
     }

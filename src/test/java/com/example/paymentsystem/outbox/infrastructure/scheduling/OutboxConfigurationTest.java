@@ -17,6 +17,6 @@ class OutboxConfigurationTest {
     /** outbox.enabled=false이면 스케줄러 Bean을 생성하지 않는지 확인한다. */
     @Test
     void disableSchedulerByDefault() {
-        assertThat(applicationContext.getBeansOfType(OutboxScheduler.class)).isEmpty();
+        assertThat(applicationContext.containsBean("outboxWorkerScheduler")).isFalse();
     }
 }

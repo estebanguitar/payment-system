@@ -78,7 +78,7 @@ class OutboxServiceTest {
         PaymentOutbox outbox = PaymentOutbox.createPaymentRequested(1L, "K", "{}", LocalDateTime.now());
         when(repository.findByIdWithLock(1L)).thenReturn(Optional.of(outbox));
         OutboxStatusService service = new OutboxStatusService(repository,
-                new OutboxProperties(false, 1, 1, 1, 1));
+                new OutboxProperties(false, 1, 1, 1, 1, 1));
         service.recordFailure(1L);
         assertThat(outbox.getStatus()).isEqualTo(OutboxStatus.FAILED);
         assertThat(outbox.getRetryCount()).isEqualTo(1);
