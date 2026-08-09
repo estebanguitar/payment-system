@@ -14,19 +14,20 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 class OpenApiContractTest {
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    /** 지갑·결제·고객·운영 API가 OpenAPI 계약에 게시되는지 검증한다. */
-    @Test
-    void openApiContainsPresentationEndpoints() throws Exception {
-        mockMvc.perform(get("/v3/api-docs")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.paths['/api/v1/wallets']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/payments']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/customers/{customerId}/payments']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/ops/payments']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/ops/audit-logs']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/ops/reconciliations/runs']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/ops/reconciliation-cases/{id}/recheck']").exists());
-    }
+  /** 지갑·결제·고객·운영 API가 OpenAPI 계약에 게시되는지 검증한다. */
+  @Test
+  void openApiContainsPresentationEndpoints() throws Exception {
+    mockMvc
+        .perform(get("/v3/api-docs"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.paths['/api/v1/wallets']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/payments']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/customers/{customerId}/payments']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/ops/payments']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/ops/audit-logs']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/ops/reconciliations/runs']").exists())
+        .andExpect(jsonPath("$.paths['/api/v1/ops/reconciliation-cases/{id}/recheck']").exists());
+  }
 }
