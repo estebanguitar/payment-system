@@ -2,7 +2,7 @@
 
 가상의 외부 결제 사업자 API와 연동해 결제 원장, 고객 지갑, 취소·환불 및 운영 모니터링 정보를 관리하는 Spring Boot 기반 백엔드 프로젝트입니다.
 
-현재 요구사항 정의가 완료되었으며, 아키텍처와 구현 계획을 수립하기 전 단계입니다. 구현 범위와 동작은 [요구사항 정의서](docs/project/requirements-definition.md)를 기준으로 합니다.
+현재 구현 범위와 동작은 [요구사항 정의서](docs/pre-initiation-deliverables/001-결제-시스템-요구사항-정의서.md)를 기준으로 합니다.
 
 ## 핵심 범위
 
@@ -14,6 +14,9 @@
 - 결제·충전·취소 요청의 멱등성 보장
 - 고객용 결제 이력과 운영자용 모니터링 조회
 - 외부 API 응답 원문의 암호화 저장
+- 결제·취소 원장과 함께 저장되는 Transactional Outbox
+- 커밋 후 즉시 처리와 모놀리스 Scheduler의 `PENDING/RETRY` 복구
+- API 요청·응답 감사 원문의 AES-256-GCM 암호화 저장
 
 ## 결제 처리 흐름
 
@@ -69,10 +72,11 @@ docker compose logs -f payment-system
 
 ## 문서
 
-- [요구사항 정의서](docs/project/requirements-definition.md): 제품 범위, 기능·비기능 요구사항, 인수 기준 및 확정 정책
-- [프로젝트 작업 원칙](docs/project/working-agreements.md): 기술 기준선, Git 작업 및 문서화 원칙
+- [요구사항 정의서](docs/pre-initiation-deliverables/001-결제-시스템-요구사항-정의서.md): 제품 범위, 기능·비기능 요구사항, 인수 기준 및 확정 정책
+- [아키텍처 정의서](docs/pre-initiation-deliverables/002-아키텍처-정의서.md): 레이어드 모놀리스와 정합성 전략
+- [현재 구현계획](docs/in-progress-deliverables/009-MVP-단순화-및-레이어드-아키텍처-전환-구현계획.md): 기능 축소와 패키지 전환 계획
 
-아키텍처 설계서, ADR 및 구현 계획은 구현 착수 전에 작성하고 검토합니다.
+운영 코드는 `domain`, `repository`, `service`, `controller`, `dto`, `integration`, `scheduler`, `common` 레이어로 구성합니다.
 
 ## 1페이즈 제외 범위
 
