@@ -6,4 +6,5 @@
 - [아키텍처 정의서](architecture.md)
 - [API 명세서](api-spec.md)
 - [구현계획](implementation-plan.md)
+- [코드 리뷰 지적사항 수정계획](remediation-plan.md)
 - [감사 로그 저장 전략](adr/audit-log-strategy.md)
